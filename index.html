@@ -111,6 +111,7 @@
             statsNav: "Statistika",
             cart: "Savat",
             profile: "Profil",
+            sellerNav: "Sotuvchi Kabineti",
             aiConsultant: "AI Konsultant",
             fullNameLabel: "Ism Familiya",
             phoneLabel: "Telefon Raqam",
@@ -160,7 +161,12 @@
             trackCodeTitle: "Jonli Kargo & Trek-Kod Tracker",
             trackCodePlaceholder: "Trek-kodni kiriting (masalan: KV-8923-CN)",
             cargoCalcTitle: "Bojxona & Kargo Kalkulyatori",
-            dbConnectedMsg: "Supabase Baza Faol"
+            dbConnectedMsg: "Supabase Baza Faol",
+            sellerBannerTitle: "Karvon Market'da Sotuvchi Bo'ling!",
+            sellerBannerSub: "Xitoy va Turkiyadan import tovarlaringizni 1,400+ xaridorlarga sotishni boshlang",
+            sellerDashboardTitle: "Sotuvchi Boshqaruv Paneli (Admin)",
+            addNewProductBtn: "Yangi Mahsulot Qo'shish 📦",
+            companyProfileTitle: "Kompaniya & Do'kon Ma'lumotlari"
           },
           ru: {
             brandSubtitle: "ИМПОРТ ИЗ КИТАЯ И ТУРЦИИ",
@@ -171,6 +177,7 @@
             statsNav: "Статистика",
             cart: "Корзина",
             profile: "Профиль",
+            sellerNav: "Кабинет Продавца",
             aiConsultant: "AI Консультант",
             fullNameLabel: "Имя Фамилия",
             phoneLabel: "Номер телефона",
@@ -388,15 +395,6 @@
           }
         ];
 
-        const MONTHLY_SALES_DATA = [
-          { month: "Fev", sales: 12500000, orders: 45 },
-          { month: "Mar", sales: 18200000, orders: 62 },
-          { month: "Apr", sales: 24800000, orders: 89 },
-          { month: "May", sales: 31000000, orders: 110 },
-          { month: "Iyun", sales: 42500000, orders: 154 },
-          { month: "Iyul", sales: 58900000, orders: 205 }
-        ];
-
         function App() {
           const [language, setLanguage] = React.useState("uz");
           const t = (key) => TRANSLATIONS[language]?.[key] || TRANSLATIONS['uz']?.[key] || key;
@@ -411,6 +409,28 @@
           const [isTrackCodeModalOpen, setIsTrackCodeModalOpen] = React.useState(false);
           const [trackCodeQuery, setTrackCodeQuery] = React.useState("");
           const [activeTrackOrder, setActiveTrackOrder] = React.useState(null);
+
+          // Seller Admin State
+          const [sellerStore, setSellerStore] = React.useState({
+            companyName: "Karvon Import Co.",
+            legalName: "Karvon Trade MChJ",
+            phone: "+998 90 674 30 14",
+            verified: true,
+            totalSales: "12,400,000 UZS"
+          });
+          const [isAddProductModalOpen, setIsAddProductModalOpen] = React.useState(false);
+          const [newProductForm, setNewProductForm] = React.useState({
+            title: "",
+            category: "Kiyim",
+            originCountry: "Turkiya (Istanbul)",
+            price: "",
+            originalPrice: "",
+            colors: "Qora, Oq, Oltin",
+            sizes: "M, L, XL",
+            inStock: "25",
+            image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+            description: ""
+          });
 
           // Checkout State
           const [isCheckoutModalOpen, setIsCheckoutModalOpen] = React.useState(false);
@@ -649,6 +669,80 @@
             }
           };
 
+          const handleCreateProductSubmit = async (e) => {
+            e.preventDefault();
+            if (!newProductForm.title.trim() || !newProductForm.price) {
+              showToast("Iltimos, mahsulot nomi va narxini kiriting!");
+              return;
+            }
+
+            const parsedSizes = newProductForm.sizes ? newProductForm.sizes.split(',').map(s => s.trim()) : [];
+            const parsedColors = newProductForm.colors ? newProductForm.colors.split(',').map(c => c.trim()) : [];
+
+            const newProductObj = {
+              id: Date.now(),
+              title: newProductForm.title,
+              price: Number(newProductForm.price),
+              originalPrice: newProductForm.originalPrice ? Number(newProductForm.originalPrice) : Math.round(Number(newProductForm.price) * 1.25),
+              discountPercent: 20,
+              category: newProductForm.category,
+              originCountry: newProductForm.originCountry,
+              rating: 5.0,
+              reviewsCount: 1,
+              image: newProductForm.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
+              seller: sellerStore.companyName,
+              deliveryDays: "2-3 kun",
+              inStock: Number(newProductForm.inStock) || 10,
+              sizes: parsedSizes,
+              colors: parsedColors,
+              badge: "Yangi Import ✨",
+              description: newProductForm.description || "Xitoy va Turkiyadan keltirilgan yuqori sifatli mahsulot."
+            };
+
+            setProducts(prev => [newProductObj, ...prev]);
+
+            if (supabase) {
+              try {
+                await supabase.from('products').insert([{
+                  title: newProductObj.title,
+                  price: newProductObj.price,
+                  originalPrice: newProductObj.originalPrice,
+                  discountPercent: newProductObj.discountPercent,
+                  category: newProductObj.category,
+                  originCountry: newProductObj.originCountry,
+                  rating: 5.0,
+                  reviewsCount: 1,
+                  image: newProductObj.image,
+                  seller: newProductObj.seller,
+                  deliveryDays: newProductObj.deliveryDays,
+                  inStock: newProductObj.inStock,
+                  sizes: newProductObj.sizes,
+                  badge: newProductObj.badge,
+                  description: newProductObj.description
+                }]);
+              } catch(err) {
+                console.log("Supabase insert log", err);
+              }
+            }
+
+            setIsAddProductModalOpen(false);
+            setNewProductForm({
+              title: "",
+              category: "Kiyim",
+              originCountry: "Turkiya (Istanbul)",
+              price: "",
+              originalPrice: "",
+              colors: "Qora, Oq, Oltin",
+              sizes: "M, L, XL",
+              inStock: "25",
+              image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+              description: ""
+            });
+
+            showToast("🎉 Yangi mahsulot omborga va Supabase bazasiga muvaffaqiyatli qo'shildi!");
+            setActiveTab("shop");
+          };
+
           const handleCompleteOrderSubmit = (e) => {
             e.preventDefault();
             if (cart.length === 0) return;
@@ -700,7 +794,7 @@
               <header className="sticky top-0 z-40 bg-[#0c1324]/90 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl">
                 <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
                   
-                  {/* Gold Logo Brand (EXACTLY MATCHING DESIGN) */}
+                  {/* Gold Logo Brand */}
                   <div className="flex items-center gap-2.5 cursor-pointer group shrink-0" onClick={() => setActiveTab("shop")}>
                     <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 via-yellow-400 to-amber-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform overflow-hidden relative border border-amber-300">
                       <i data-lucide="shopping-bag" className="w-5 h-5 text-slate-950 stroke-[2.5]"></i>
@@ -715,7 +809,7 @@
                     </div>
                   </div>
 
-                  {/* Search Bar Desktop with Visual Camera Search */}
+                  {/* Search Bar Desktop */}
                   <div className="flex-1 max-w-xl relative hidden sm:block">
                     <i data-lucide="search" className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
                     <input
@@ -752,9 +846,9 @@
                       <span>{t("categories")}</span>
                     </button>
 
-                    <button onClick={() => setActiveTab("search")} className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${activeTab === 'search' ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-200 hover:bg-slate-800/80'}`}>
-                      <i data-lucide="search" className="w-4 h-4"></i>
-                      <span>{t("searchNav")}</span>
+                    <button onClick={() => setActiveTab("seller")} className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${activeTab === 'seller' ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'text-amber-400 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20'}`}>
+                      <i data-lucide="store" className="w-4 h-4 text-amber-400"></i>
+                      <span>{t("sellerNav")}</span>
                     </button>
 
                     <button 
@@ -843,7 +937,7 @@
                 {activeTab === 'shop' && (
                   <div className="space-y-5 sm:space-y-8">
                     
-                    {/* User Greeting Bubble with DB Status */}
+                    {/* User Greeting Bubble */}
                     <div className="flex items-center justify-between bg-slate-900/80 border border-slate-800/90 rounded-2xl p-3 shadow-lg backdrop-blur-md">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-black flex items-center justify-center text-sm shadow">
@@ -868,7 +962,7 @@
                       </div>
                     </div>
 
-                    {/* HERO BANNER - Gold Silk Road Theme with 3D Gold Bag Visual */}
+                    {/* HERO BANNER */}
                     <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950 text-white p-5 sm:p-10 gold-border-glow shadow-2xl flex items-center justify-between">
                       <div className="max-w-xl relative z-10 space-y-3">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] sm:text-xs font-bold backdrop-blur-md">
@@ -907,7 +1001,7 @@
                         </div>
                       </div>
 
-                      {/* 3D Gold Bag Visual Element on Banner Right */}
+                      {/* 3D Gold Bag Visual Element */}
                       <div className="hidden lg:flex shrink-0 relative z-10 w-64 h-64 items-center justify-center">
                         <div className="w-52 h-52 rounded-3xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 p-1 shadow-2xl gold-border-glow animate-pulse transform rotate-3 flex flex-col items-center justify-center text-slate-950 text-center font-black">
                           <i data-lucide="shopping-bag" className="w-20 h-20 text-slate-950 stroke-[1.5] mb-2"></i>
@@ -947,7 +1041,6 @@
                       ))}
                     </div>
 
-                    {/* Products Grid */}
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <h2 className="text-base sm:text-xl font-extrabold text-slate-100 flex items-center gap-2">
@@ -1048,7 +1141,6 @@
                   </div>
                 )}
 
-                {/* Categories Tab */}
                 {activeTab === 'categories' && (
                   <div className="space-y-4 max-w-3xl mx-auto pb-10">
                     <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -1063,7 +1155,6 @@
                     <div className="bg-slate-900 rounded-3xl border border-slate-800 divide-y divide-slate-800/80 overflow-hidden shadow-xl">
                       {CATEGORIES_MAPPING.map((cat) => {
                         const catProducts = products.filter(p => p.category === cat.key);
-                        const totalStockInCat = catProducts.reduce((sum, p) => sum + (p.inStock || 0), 0);
 
                         return (
                           <div
@@ -1072,20 +1163,24 @@
                             className="flex items-center justify-between p-4 hover:bg-slate-800/80 transition-colors cursor-pointer group"
                           >
                             <div className="flex items-center gap-4">
-                              <div className={`w-11 h-11 rounded-2xl ${cat.color} flex items-center justify-center border shadow-sm`}>
+                              <div className={`w-11 h-11 rounded-2xl ${cat.color} flex items-center justify-center border shadow-sm group-hover:scale-105 transition-transform`}>
                                 <i data-lucide={cat.icon} className="w-5 h-5"></i>
                               </div>
                               <div>
-                                <h3 className="text-xs sm:text-sm font-bold text-slate-100 group-hover:text-amber-400 transition-colors">{cat[language] || cat.uz}</h3>
-                                <p className="text-[10px] sm:text-[11px] text-slate-400">{cat.sub.join(" • ")}</p>
+                                <h3 className="text-xs sm:text-sm font-bold text-slate-100 group-hover:text-amber-400 transition-colors">
+                                  {cat[language] || cat.uz}
+                                </h3>
+                                <p className="text-[10px] sm:text-[11px] text-slate-400 font-normal line-clamp-1">
+                                  {cat.sub.join(" • ")}
+                                </p>
                               </div>
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 whitespace-nowrap">
-                                {catProducts.length} tur • Ombor: {totalStockInCat} dona
+                              <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                {catProducts.length} {t("itemsCount")}
                               </span>
-                              <i data-lucide="chevron-right" className="w-4 h-4 text-slate-500"></i>
+                              <i data-lucide="chevron-right" className="w-4 h-4 text-slate-500 group-hover:text-amber-400"></i>
                             </div>
                           </div>
                         );
@@ -1094,121 +1189,53 @@
                   </div>
                 )}
 
-                {/* Search Tab View */}
                 {activeTab === 'search' && (
-                  <div className="space-y-6 max-w-3xl mx-auto pb-12">
-                    
-                    {/* Big Prominent Search Bar Box */}
-                    <div className="bg-slate-900/90 border border-amber-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl relative gold-border-glow">
-                      <div className="text-center mb-4">
-                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest block mb-1">
-                          ⚡ Aqlli Qidiruv Tizimi
-                        </span>
-                        <h2 className="text-lg sm:text-2xl font-black gold-gradient-text">
-                          Katalogdan Nimani Izlayapsiz?
-                        </h2>
-                      </div>
+                  <div className="max-w-3xl mx-auto space-y-6 pb-12">
+                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-2xl space-y-3">
+                      <h2 className="text-base font-black text-slate-100 flex items-center gap-2">
+                        <i data-lucide="search" className="w-5 h-5 text-amber-400"></i>
+                        <span>Katalogdan Izlash</span>
+                      </h2>
 
                       <div className="relative">
-                        <i data-lucide="search" className="w-5 h-5 text-amber-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                        <i data-lucide="search" className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
                         <input
                           type="text"
-                          placeholder="Mahsulot nomi, razmer yoki brend kiritishingiz mumkin..."
+                          placeholder={t("searchPlaceholder")}
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full pl-12 pr-12 py-3.5 bg-slate-950 text-white text-sm rounded-2xl border-2 border-amber-500/50 focus:border-amber-400 outline-none transition-all"
                           autoFocus
-                          className="w-full pl-12 pr-12 py-3.5 bg-slate-950 text-white text-xs sm:text-sm rounded-2xl border-2 border-slate-800 focus:border-amber-500 outline-none transition-all shadow-inner placeholder-slate-500 font-medium"
                         />
                         <button
                           onClick={() => setIsVisualSearchOpen(true)}
-                          title="Rasm orqali qidirish"
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950 rounded-xl transition-all border border-amber-500/30"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950 rounded-xl transition-all"
                         >
-                          <i data-lucide="camera" className="w-4 h-4"></i>
+                          <i data-lucide="camera" className="w-5 h-5"></i>
                         </button>
                       </div>
-
-                      {searchQuery && (
-                        <div className="mt-3 flex items-center justify-between text-xs text-slate-400 px-1">
-                          <span>Qidiruv natijasi: <strong className="text-amber-400">{filteredProducts.length} ta</strong> mahsulot</span>
-                          <button onClick={() => setSearchQuery("")} className="text-rose-400 font-bold hover:underline">
-                            Tozalash ✕
-                          </button>
-                        </div>
-                      )}
                     </div>
 
-                    {/* Filtered Search Results Grid */}
-                    {searchQuery ? (
-                      <div className="space-y-3">
-                        <h3 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Topilgan Mahsulotlar</h3>
-                        {filteredProducts.length === 0 ? (
-                          <div className="bg-slate-900 rounded-3xl p-8 text-center border border-slate-800">
-                            <i data-lucide="search-x" className="w-10 h-10 text-slate-600 mx-auto mb-2"></i>
-                            <p className="text-xs text-slate-400">Hech qanday mahsulot topilmadi. Boshqa kalit so'z ishlatib ko'ring.</p>
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {filteredProducts.map(product => (
-                              <div key={product.id} className="bg-slate-900 rounded-2xl p-3 border border-slate-800 flex flex-col justify-between">
-                                <img src={product.image} alt={product.title} className="w-full aspect-square object-cover rounded-xl mb-2" />
-                                <h4 className="text-xs font-bold text-slate-100 line-clamp-1">{product.title}</h4>
-                                <span className="text-xs font-black text-amber-400 my-1">{product.price.toLocaleString()} UZS</span>
-                                <button
-                                  onClick={() => addToCart(product)}
-                                  className="w-full py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1"
-                                >
-                                  <i data-lucide="shopping-cart" className="w-3.5 h-3.5"></i> {t("addToCart")}
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : null}
-
-                    {/* Categories grid directly below the search input */}
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xs font-extrabold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-                          <i data-lucide="grid" className="w-4 h-4 text-amber-400"></i>
-                          <span>Kategoriyalar Bo'yicha Izlash</span>
-                        </h3>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-2 gap-2.5">
-                        {CATEGORIES_MAPPING.map(cat => {
-                          const catProducts = products.filter(p => p.category === cat.key);
-                          const totalStockInCat = catProducts.reduce((sum, p) => sum + (p.inStock || 0), 0);
-
-                          return (
-                            <div
-                              key={cat.key}
-                              onClick={() => {
-                                setSelectedCategory(cat.key);
-                                setActiveTab("shop");
-                              }}
-                              className="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-3 rounded-2xl cursor-pointer transition-all flex items-center gap-3 group shadow-md"
-                            >
-                              <div className={`w-10 h-10 rounded-xl ${cat.color} flex items-center justify-center shrink-0 border`}>
-                                <i data-lucide={cat.icon} className="w-5 h-5"></i>
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <h4 className="text-xs font-bold text-slate-100 group-hover:text-amber-400 truncate">{cat[language] || cat.uz}</h4>
-                                <span className="text-[10px] text-slate-400 block">{catProducts.length} tur • {totalStockInCat} dona</span>
-                              </div>
-                            </div>
-                          );
-                        })}
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Kategoriyalar bo'yicha Saralash</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        {CATEGORIES_MAPPING.map(cat => (
+                          <button
+                            key={cat.key}
+                            onClick={() => { setSelectedCategory(cat.key); setActiveTab("shop"); }}
+                            className="p-3 bg-slate-900 border border-slate-800 rounded-2xl text-left hover:border-amber-500/50 transition-all flex flex-col justify-between"
+                          >
+                            <i data-lucide={cat.icon} className="w-5 h-5 text-amber-400 mb-2"></i>
+                            <span className="text-xs font-bold text-slate-200 block truncate">{cat[language] || cat.uz}</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
-
                   </div>
                 )}
 
-                {/* Favorites / Wishlist Tab */}
                 {activeTab === 'wishlist' && (
-                  <div className="max-w-4xl mx-auto space-y-4 pb-12">
+                  <div className="max-w-4xl mx-auto space-y-4">
                     <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
                       <i data-lucide="heart" className="w-5 h-5 text-rose-500 fill-rose-500"></i> {t("favorites")} ({wishlist.length})
                     </h2>
@@ -1238,74 +1265,10 @@
                   </div>
                 )}
 
-                {/* Analytics & Stats Tab */}
-                {activeTab === 'stats' && (
-                  <div className="space-y-6 max-w-6xl mx-auto pb-12">
-                    <div className="flex items-center justify-between bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black">
-                          <i data-lucide="bar-chart-3" className="w-6 h-6"></i>
-                        </div>
-                        <div>
-                          <h2 className="text-lg font-black text-slate-100">{t("statsTitle")}</h2>
-                          <p className="text-xs text-amber-400 font-semibold">Karvon Market Live Analitika</p>
-                        </div>
-                      </div>
-
-                      <button onClick={() => setIsCargoCalcOpen(true)} className="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-2xl flex items-center gap-2 shadow-lg">
-                        <i data-lucide="calculator" className="w-4 h-4 text-amber-300"></i>
-                        <span>Bojxona Kalkulyatori ⚖️</span>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
-                        <span className="text-[11px] font-bold text-slate-400">{t("totalRevenue")}</span>
-                        <div className="text-lg sm:text-2xl font-black text-amber-400 mt-1">58,900,000 <span className="text-xs text-slate-400">UZS</span></div>
-                        <div className="text-[10px] text-emerald-400 font-bold mt-2">↑ +24.5% o'tgan oyga nisbatan</div>
-                      </div>
-
-                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
-                        <span className="text-[11px] font-bold text-slate-400">{t("activeOrders")}</span>
-                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">{orders.length + 18} ta</div>
-                        <div className="text-[10px] text-amber-400 font-bold mt-2">12 ta xalqaro yo'lda</div>
-                      </div>
-
-                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
-                        <span className="text-[11px] font-bold text-slate-400">{t("totalCustomers")}</span>
-                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">1,420 mijoz</div>
-                        <div className="text-[10px] text-emerald-400 font-bold mt-2">↑ +18% yangi a'zolar</div>
-                      </div>
-
-                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
-                        <span className="text-[11px] font-bold text-slate-400">{t("importVolume")}</span>
-                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">3,850 kg</div>
-                        <div className="text-[10px] text-purple-400 font-bold mt-2">Shenzhen & Istanbul</div>
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">
-                      <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                        <i data-lucide="bar-chart-3" className="w-4 h-4 text-amber-400"></i>
-                        <span>{t("monthlyGrowth")}</span>
-                      </h3>
-                      <div className="h-44 flex items-end justify-between gap-2 pt-6 px-2">
-                        {MONTHLY_SALES_DATA.map((d, i) => (
-                          <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                            <div style={{ height: `${(d.sales/58900000)*100}%` }} className="w-full bg-gradient-to-t from-amber-600 to-yellow-300 rounded-t-xl"></div>
-                            <span className="text-[10px] font-bold text-slate-400">{d.month}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Profile Tab */}
                 {activeTab === 'profile' && (
                   <div className="max-w-md mx-auto space-y-4 pb-12">
                     
-                    {/* User Profile / Login Banner */}
+                    {/* User Profile Banner */}
                     <div 
                       onClick={() => {
                         if (!currentUser) {
@@ -1333,146 +1296,134 @@
                       <i data-lucide="chevron-right" className="w-5 h-5 text-slate-950"></i>
                     </div>
 
-                    {/* Telegram Admin Notification Setting Box */}
+                    {/* BECOME A SELLER CARD */}
+                    <div 
+                      onClick={() => setActiveTab("seller")}
+                      className="bg-gradient-to-br from-slate-900 via-slate-900 to-amber-950/80 border-2 border-amber-500/50 p-4.5 rounded-3xl shadow-2xl cursor-pointer hover:scale-[1.02] transition-all flex items-center justify-between group gold-border-glow"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-slate-950 flex items-center justify-center font-black shadow-lg group-hover:rotate-6 transition-transform">
+                          <i data-lucide="store" className="w-6 h-6"></i>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-black text-slate-100 gold-gradient-text">{t("sellerBannerTitle")}</h3>
+                            <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-[9px] font-extrabold rounded-full border border-amber-400/30">PRO</span>
+                          </div>
+                          <p className="text-[11px] text-slate-300 mt-0.5 line-clamp-1">{t("sellerBannerSub")}</p>
+                        </div>
+                      </div>
+                      <i data-lucide="arrow-right" className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+
+                    {/* Telegram Admin Setting Box */}
                     <div className="bg-slate-900 border border-sky-500/40 p-4 rounded-2xl space-y-2">
                       <div className="flex items-center gap-2 text-sky-400 text-xs font-bold">
                         <i data-lucide="send" className="w-4 h-4"></i>
                         <span>Telegram Admin Chat ID Sozlamasi</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 leading-snug">
-                        Buyurtmalar o'zingizning Telegramingizga kelishi uchun Chat ID raqamingizni kiriting:
-                      </p>
                       <div className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="Masalan: 123456789"
                           value={adminChatIdInput}
                           onChange={(e) => setAdminChatIdInput(e.target.value)}
-                          className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-sky-400"
+                          placeholder="592559121"
+                          className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white outline-none"
                         />
                         <button
                           onClick={() => saveAdminChatId(adminChatIdInput)}
-                          className="px-3.5 py-2 bg-sky-500 text-slate-950 text-xs font-black rounded-xl"
+                          className="px-3 py-1.5 bg-sky-500 text-slate-950 font-bold text-xs rounded-xl"
                         >
                           Saqlash
                         </button>
                       </div>
                     </div>
 
-                    {/* Quick Actions */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        onClick={() => setIsTrackCodeModalOpen(true)}
-                        className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-3 transition-all text-left shadow-sm group"
-                      >
-                        <div className="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
-                          <i data-lucide="truck" className="w-5 h-5"></i>
+                  </div>
+                )}
+
+                {activeTab === 'seller' && (
+                  <div className="max-w-4xl mx-auto space-y-6 pb-16">
+                    
+                    {/* Header Banner */}
+                    <div className="bg-slate-900 border border-amber-500/40 p-5 rounded-3xl shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 gold-border-glow">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 via-yellow-400 to-amber-500 text-slate-950 flex items-center justify-center font-black shadow-lg shrink-0">
+                          <i data-lucide="store" className="w-6 h-6 text-slate-950"></i>
                         </div>
                         <div>
-                          <span className="text-xs font-bold text-slate-100 block">Buyurtmalarim</span>
-                          <span className="text-[10px] text-slate-400">{orders.length} ta faol</span>
+                          <div className="flex items-center gap-2">
+                            <h2 className="text-base sm:text-xl font-black text-slate-100">{sellerStore.companyName}</h2>
+                            <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-extrabold rounded-full flex items-center gap-1">
+                              <i data-lucide="shield-check" className="w-3 h-3"></i> Tasdiqlangan
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 mt-0.5">{sellerStore.legalName} • {sellerStore.phone}</p>
                         </div>
-                      </button>
+                      </div>
 
                       <button
-                        onClick={() => setActiveTab("wishlist")}
-                        className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-3 transition-all text-left shadow-sm group"
+                        onClick={() => setIsAddProductModalOpen(true)}
+                        className="w-full sm:w-auto px-5 py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-slate-950 font-black text-xs rounded-2xl shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2"
                       >
-                        <div className="p-2.5 bg-rose-500/10 text-rose-400 rounded-xl group-hover:bg-rose-500 group-hover:text-white transition-colors">
-                          <i data-lucide="heart" className="w-5 h-5"></i>
-                        </div>
-                        <div>
-                          <span className="text-xs font-bold text-slate-100 block">{t("favorites")}</span>
-                          <span className="text-[10px] text-slate-400">{wishlist.length} ta</span>
-                        </div>
+                        <i data-lucide="plus-circle" className="w-4 h-4 text-slate-950"></i>
+                        <span>{t("addNewProductBtn")}</span>
                       </button>
                     </div>
 
-                    {/* Order History Cards */}
-                    {orders.length > 0 && (
-                      <div className="space-y-2 pt-2">
-                        <h4 className="text-xs font-bold text-slate-400 px-1 uppercase tracking-wider">So'nggi Buyurtmalar</h4>
-                        <div className="space-y-2">
-                          {orders.map(ord => (
-                            <div key={ord.id} className="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl text-xs space-y-1">
-                              <div className="flex justify-between font-bold">
-                                <span className="text-sky-400">Trek: {ord.id}</span>
-                                <span className="text-amber-400">{ord.total.toLocaleString()} so'm</span>
-                              </div>
-                              <div className="text-[11px] text-slate-300 font-medium">{ord.status}</div>
-                              <div className="text-[10px] text-slate-500">{ord.address} • {ord.date}</div>
-                            </div>
-                          ))}
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+                        <span className="text-[11px] font-bold text-slate-400 block">Mening Mahsulotlarim</span>
+                        <div className="text-xl font-black text-amber-400">{products.length} ta</div>
+                      </div>
+
+                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
+                        <span className="text-[11px] font-bold text-slate-400 block">Jami Savdo Hajmi</span>
+                        <div className="text-xl font-black text-emerald-400">{sellerStore.totalSales}</div>
+                      </div>
+
+                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1 col-span-2 sm:col-span-1">
+                        <span className="text-[11px] font-bold text-slate-400 block">Status & Reyting</span>
+                        <div className="text-xl font-black text-sky-400 flex items-center gap-1">
+                          <i data-lucide="star" className="w-4 h-4 fill-amber-400 text-amber-400"></i> 4.9 (Top Importer)
                         </div>
-                      </div>
-                    )}
-
-                    {/* Wallet Balance Box */}
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between relative overflow-hidden shadow-md">
-                      <div className="space-y-1 relative z-10">
-                        <span className="text-[11px] font-bold text-slate-400 block">{t("walletBalance")}</span>
-                        <div className="text-xl font-black text-amber-400">0 {t("currency")}</div>
-                        <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-full inline-block border border-emerald-500/20">
-                          {t("bonusCashback")}
-                        </span>
-                      </div>
-
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-orange-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                        <i data-lucide="wallet" className="w-7 h-7"></i>
                       </div>
                     </div>
 
-                    {/* Settings & Language */}
-                    <div className="space-y-2 pt-2">
-                      <h4 className="text-xs font-bold text-slate-400 px-1 uppercase tracking-wider">{t("helpSettings")}</h4>
-                      <div className="bg-slate-900 border border-slate-800 rounded-2xl divide-y divide-slate-800/80 overflow-hidden">
-                        
-                        <div className="p-3.5 flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-slate-800 text-amber-400 rounded-xl">
-                              <i data-lucide="languages" className="w-4 h-4"></i>
-                            </div>
-                            <span className="text-xs font-bold text-slate-200">{t("languageSelect")}</span>
-                          </div>
-                          <div className="flex bg-slate-950 border border-slate-800 rounded-xl p-1 text-xs font-bold">
-                            <button onClick={() => setLanguage('uz')} className={`px-2 py-0.5 rounded-lg ${language === 'uz' ? 'bg-amber-500 text-slate-950' : 'text-slate-400'}`}>UZ</button>
-                            <button onClick={() => setLanguage('ru')} className={`px-2 py-0.5 rounded-lg ${language === 'ru' ? 'bg-amber-500 text-slate-950' : 'text-slate-400'}`}>RU</button>
-                            <button onClick={() => setLanguage('en')} className={`px-2 py-0.5 rounded-lg ${language === 'en' ? 'bg-amber-500 text-slate-950' : 'text-slate-400'}`}>EN</button>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => setIsAiChatOpen(true)}
-                          className="w-full p-3.5 flex items-center justify-between text-left hover:bg-slate-800/60"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-purple-500/20 text-purple-400 rounded-xl">
-                              <i data-lucide="bot" className="w-4 h-4"></i>
-                            </div>
-                            <span className="text-xs font-bold text-slate-200">{t("aiSupport")}</span>
-                          </div>
-                          <i data-lucide="chevron-right" className="w-4 h-4 text-slate-500"></i>
+                    {/* Seller Products List */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-extrabold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                          <i data-lucide="package" className="w-4 h-4 text-amber-400"></i>
+                          <span>Ombordagi Mahsulotlarim</span>
+                        </h3>
+                        <button onClick={() => setIsAddProductModalOpen(true)} className="text-xs font-bold text-amber-400 hover:underline">
+                          + Yangi qo'shish
                         </button>
-
                       </div>
-                    </div>
 
-                    {currentUser && (
-                      <button
-                        onClick={() => {
-                          setCurrentUser(null);
-                          showToast("Hisobdan chiqildi");
-                        }}
-                        className="w-full py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs rounded-2xl border border-rose-500/30 flex items-center justify-center gap-2 transition-colors"
-                      >
-                        <i data-lucide="log-out" className="w-4 h-4"></i>
-                        <span>Hisobdan chiqish</span>
-                      </button>
-                    )}
-
-                    <div className="text-center pt-2 pb-8">
-                      <span className="text-[11px] text-slate-500 font-bold tracking-wider block">Versiya 2.4.0 (Telegram Live)</span>
-                      <span className="text-[9px] text-slate-600 block mt-0.5">Karvon Market Engine • 2026</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {products.map(p => (
+                          <div key={p.id} className="bg-slate-900 border border-slate-800 p-3 rounded-2xl flex items-center gap-3">
+                            <img src={p.image} alt={p.title} className="w-16 h-16 object-cover rounded-xl shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-xs font-bold text-slate-100 truncate">{p.title}</h4>
+                              <div className="flex items-center gap-2 text-[10px] text-slate-400 my-0.5">
+                                <span>{p.category}</span>
+                                <span>•</span>
+                                <span className="text-amber-400 font-bold">{p.originCountry}</span>
+                              </div>
+                              <div className="flex items-center justify-between mt-1">
+                                <span className="text-xs font-black text-amber-400">{p.price.toLocaleString()} UZS</span>
+                                <span className="text-[10px] font-bold bg-slate-950 text-slate-300 px-2 py-0.5 rounded-md border border-slate-800">
+                                  Zaxira: {p.inStock || 15} dona
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                   </div>
@@ -1480,7 +1431,158 @@
 
               </main>
 
-              {/* AUTH MODAL */}
+              {isAddProductModalOpen && (
+                <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <button onClick={() => setIsAddProductModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl border border-amber-500/30">
+                        <i data-lucide="package-plus" className="w-6 h-6"></i>
+                      </div>
+                      <div>
+                        <h3 className="text-base font-black text-slate-100">Yangi Mahsulot Qo'shish</h3>
+                        <p className="text-xs text-slate-400">Karvon Market katalogiga yangi tovaringizni kiriting</p>
+                      </div>
+                    </div>
+
+                    <form onSubmit={handleCreateProductSubmit} className="space-y-4">
+                      
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">Mahsulot Nomi</label>
+                        <input
+                          type="text"
+                          placeholder="Masalan: Erkaklar Qishki Charm Kurtkasi"
+                          value={newProductForm.title}
+                          onChange={(e) => setNewProductForm({...newProductForm, title: e.target.value})}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-amber-500"
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Kategoriya</label>
+                          <select
+                            value={newProductForm.category}
+                            onChange={(e) => setNewProductForm({...newProductForm, category: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none"
+                          >
+                            {CATEGORIES_MAPPING.map(c => (
+                              <option key={c.key} value={c.key}>{c.uz}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Kelgan Mamlakat</label>
+                          <select
+                            value={newProductForm.originCountry}
+                            onChange={(e) => setNewProductForm({...newProductForm, originCountry: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white outline-none"
+                          >
+                            <option value="Xitoy (Shenzhen)">Xitoy (Shenzhen)</option>
+                            <option value="Turkiya (Istanbul)">Turkiya (Istanbul)</option>
+                            <option value="O'zbekiston">O'zbekiston (Mahalliy)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Sotuv Narxi (UZS)</label>
+                          <input
+                            type="number"
+                            placeholder="380000"
+                            value={newProductForm.price}
+                            onChange={(e) => setNewProductForm({...newProductForm, price: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-amber-500"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Asl Narxi (Chegirma uchun UZS)</label>
+                          <input
+                            type="number"
+                            placeholder="490000"
+                            value={newProductForm.originalPrice}
+                            onChange={(e) => setNewProductForm({...newProductForm, originalPrice: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Mavjud Ranglar</label>
+                          <input
+                            type="text"
+                            placeholder="Qora, Jigarrang, Oltin"
+                            value={newProductForm.colors}
+                            onChange={(e) => setNewProductForm({...newProductForm, colors: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Mavjud Razmerlar</label>
+                          <input
+                            type="text"
+                            placeholder="S, M, L, XL, XXL"
+                            value={newProductForm.sizes}
+                            onChange={(e) => setNewProductForm({...newProductForm, sizes: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Ombordagi Soni (Dona)</label>
+                          <input
+                            type="number"
+                            placeholder="25"
+                            value={newProductForm.inStock}
+                            onChange={(e) => setNewProductForm({...newProductForm, inStock: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1">Mahsulot Rasmi (URL)</label>
+                          <input
+                            type="url"
+                            placeholder="https://images.unsplash.com/..."
+                            value={newProductForm.image}
+                            onChange={(e) => setNewProductForm({...newProductForm, image: e.target.value})}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">Mahsulot Haqida Batafsil Ma'lumot</label>
+                        <textarea
+                          rows={3}
+                          placeholder="100% paxta, qalin va sifatli matodan ishlangan..."
+                          value={newProductForm.description}
+                          onChange={(e) => setNewProductForm({...newProductForm, description: e.target.value})}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white outline-none focus:border-amber-500 resize-none"
+                        ></textarea>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-3.5 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-slate-950 font-black text-xs rounded-xl shadow-xl hover:scale-[1.02] transition-all"
+                      >
+                        Chop Etish va Supabase Bazasiga Qo'shish 🚀
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
               {isAuthModalOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-6 relative shadow-2xl">
@@ -1636,7 +1738,6 @@
                 </div>
               )}
 
-              {/* Visual Search Modal */}
               {isVisualSearchOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
@@ -1691,7 +1792,6 @@
                 </div>
               )}
 
-              {/* Track Code Tracker Modal */}
               {isTrackCodeModalOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 relative shadow-2xl">
@@ -1715,94 +1815,6 @@
                         <div className="text-slate-500">3. Toshkent markaziy omborida</div>
                       </div>
                     )}
-                  </div>
-                </div>
-              )}
-
-              {/* Cargo Calculator Modal */}
-              {isCargoCalcOpen && (
-                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
-                    <button onClick={() => setIsCargoCalcOpen(false)} className="absolute top-4 right-4 text-slate-400">✕</button>
-                    <h3 className="text-base font-black text-slate-100 mb-3">{t("cargoCalcTitle")}</h3>
-                    <div className="space-y-3 mb-4 text-xs">
-                      <div>
-                        <label className="text-slate-400 block mb-1">Tovarning Narxi ($)</label>
-                        <input type="number" value={itemPriceUsd} onChange={(e) => setItemPriceUsd(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white" />
-                      </div>
-                      <div>
-                        <label className="text-slate-400 block mb-1">Vazni (Kg)</label>
-                        <input type="number" step="0.1" value={cargoWeight} onChange={(e) => setCargoWeight(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white" />
-                      </div>
-                    </div>
-                    <div className="bg-slate-950 p-4 rounded-2xl space-y-2 text-xs mb-4">
-                      <div className="flex justify-between text-amber-400 font-bold">
-                        <span>Sof Tan Narx:</span>
-                        <span>{Math.round((itemPriceUsd + (cargoWeight * 6.5)) * 12800).toLocaleString()} so'm</span>
-                      </div>
-                      <div className="flex justify-between text-emerald-400 font-black">
-                        <span>Sotuv Narxi (35% Margin):</span>
-                        <span>{Math.round((itemPriceUsd + (cargoWeight * 6.5)) * 12800 * 1.35).toLocaleString()} so'm</span>
-                      </div>
-                    </div>
-                    <button onClick={() => { showToast("Sotuv narxi hisoblandi!"); setIsCargoCalcOpen(false); }} className="w-full py-3 bg-amber-500 text-slate-950 font-black text-xs rounded-xl">Saqlash</button>
-                  </div>
-                </div>
-              )}
-
-              {/* Product Modal Details */}
-              {selectedProduct && (
-                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-5 relative shadow-2xl max-h-[90vh] overflow-y-auto">
-                    <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
-
-                    <img src={selectedProduct.image} alt={selectedProduct.title} className="w-full h-64 object-cover rounded-2xl mb-4" />
-                    
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                        <i data-lucide="globe" className="w-3 h-3 inline mr-1"></i> {selectedProduct.originCountry}
-                      </span>
-                      <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                        <i data-lucide="credit-card" className="w-3 h-3 inline mr-1"></i> 0% Nasiya
-                      </span>
-                    </div>
-
-                    <h3 className="text-base font-black text-slate-100 mb-2">{selectedProduct.title}</h3>
-                    <p className="text-xs text-slate-300 leading-relaxed mb-4">{selectedProduct.description}</p>
-
-                    <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 p-3.5 rounded-2xl mb-4 flex items-center justify-between">
-                      <div>
-                        <span className="text-xs font-bold text-amber-300 block">👥 Jamoaviy Xarid Narxi (-25% Chegirma):</span>
-                        <span className="text-base font-black text-white">{Math.round(selectedProduct.price * 0.75).toLocaleString()} UZS</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          showToast("Jamoaviy xarid guruhi yaratildi! Havola nusxalandi 🔗");
-                          addToCart({ ...selectedProduct, price: Math.round(selectedProduct.price * 0.75) });
-                          setSelectedProduct(null);
-                        }}
-                        className="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs rounded-xl shadow"
-                      >
-                        Guruh Tuzish 👥
-                      </button>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-                      <div>
-                        <span className="text-xs text-slate-400 block">Oddiy Yakka Narx:</span>
-                        <span className="text-lg font-black text-amber-400">{selectedProduct.price.toLocaleString()} UZS</span>
-                      </div>
-
-                      <button
-                        onClick={() => {
-                          addToCart(selectedProduct);
-                          setSelectedProduct(null);
-                        }}
-                        className="px-5 py-2.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-md"
-                      >
-                        {t("addToCart")}
-                      </button>
-                    </div>
                   </div>
                 </div>
               )}
@@ -1927,7 +1939,6 @@
                 </div>
               )}
 
-              {/* Bottom Nav Bar */}
               <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c1324]/95 backdrop-blur-xl border-t border-slate-800/80 md:hidden flex justify-around items-center py-2 px-1 shadow-2xl">
                 <button onClick={() => setActiveTab("shop")} className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${activeTab === 'shop' ? 'text-amber-400' : 'text-slate-400'}`}>
                   <i data-lucide="shopping-bag" className="w-4 h-4"></i>
