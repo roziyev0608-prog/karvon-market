@@ -73,6 +73,11 @@
         const SUPABASE_KEY = "sb_publishable_xs4xGZrZXWpSslI0i5iOdQ_qyfpdvzw";
         const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
+        // TELEGRAM BOT INTEGRATION CONFIG
+        const BOT_TOKEN = "8865005665:AAE91wHlBFGpPEt7TF0onb6nmFSYcJdSiZY";
+        // Default target admin chat or group ID (can be updated dynamically in profile settings)
+        let DEFAULT_ADMIN_CHAT_ID = localStorage.getItem("karvon_admin_chat_id") || "";
+
         const TRANSLATIONS = {
           uz: {
             brandSubtitle: "Xitoy & Turkiya Import",
@@ -370,6 +375,8 @@
           const [language, setLanguage] = React.useState("uz");
           const t = (key) => TRANSLATIONS[language]?.[key] || TRANSLATIONS['uz']?.[key] || key;
 
+          const [adminChatIdInput, setAdminChatIdInput] = React.useState(DEFAULT_ADMIN_CHAT_ID);
+
           const [isVisualSearchOpen, setIsVisualSearchOpen] = React.useState(false);
           const [uploadedImagePreview, setUploadedImagePreview] = React.useState(null);
           const [isSearchingImage, setIsSearchingImage] = React.useState(false);
@@ -462,6 +469,43 @@
           const showToast = (msg) => {
             setToastMessage(msg);
             setTimeout(() => setToastMessage(""), 4000);
+          };
+
+          const saveAdminChatId = (newId) => {
+            setAdminChatIdInput(newId);
+            localStorage.setItem("karvon_admin_chat_id", newId);
+            showToast("Telegram Admin Chat ID saqlandi!");
+          };
+
+          // Send Order Notification directly to Admin via Telegram Bot API
+          const sendTelegramOrderNotification = async (orderObj) => {
+            const targetChatId = adminChatIdInput || DEFAULT_ADMIN_CHAT_ID;
+            if (!targetChatId) return;
+
+            const itemsFormatted = cart.map((c, i) => `${i+1}. ${c.title} x ${c.qty} = ${(c.price * c.qty).toLocaleString()} so'm`).join('\n');
+            const message = 
+              `🚨 *YANGI BUYURTMA TUSHDI!* (Karvon Market)\n\n` +
+              `🆔 *Trek-kod:* \`${orderObj.id}\`\n` +
+              `👤 *Mijoz:* ${orderObj.customerName}\n` +
+              `📞 *Tel:* \`${orderObj.phone}\`\n` +
+              `📍 *Manzil:* ${orderObj.address}\n` +
+              `💳 *To'lov usuli:* ${checkoutPaymentMethod.toUpperCase()}\n\n` +
+              `🛒 *Mahsulotlar:* \n${itemsFormatted}\n\n` +
+              `💰 *JAMI SUMMA:* *${orderObj.total.toLocaleString()} so'm*`;
+
+            try {
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  chat_id: targetChatId,
+                  text: message,
+                  parse_mode: 'Markdown'
+                })
+              });
+            } catch (e) {
+              console.error("Telegram xabarnoma yuborishda xatolik:", e);
+            }
           };
 
           const toggleWishlist = (product) => {
@@ -590,7 +634,7 @@
             const newOrderObj = {
               id: newCode,
               customerName: currentUser ? currentUser.fullName : "Xaridor",
-              phone: currentUser ? currentUser.phone : "+998 90 --- -- --",
+              phone: currentUser ? currentUser.phone : "+998 90 123 45 67",
               address: checkoutAddress,
               date: new Date().toISOString().split('T')[0],
               status: "Bajarilmoqda (Xitoy/Turkiya omborida)",
@@ -599,11 +643,14 @@
               itemsCount: cart.length
             };
 
+            // Send notification to Telegram
+            sendTelegramOrderNotification(newOrderObj);
+
             setOrders([newOrderObj, ...orders]);
             setCart([]);
             setIsCheckoutModalOpen(false);
             setIsCartOpen(false);
-            showToast(`🎉 Buyurtma rasmiylashtirildi! Trek-kod: ${newCode}`);
+            showToast(`🎉 Buyurtma rasmiylashtirildi! Telegram botga yuborildi. Trek-kod: ${newCode}`);
           };
 
           const filteredProducts = React.useMemo(() => {
@@ -1106,6 +1153,32 @@
                       <i data-lucide="chevron-right" className="w-5 h-5 text-slate-950"></i>
                     </div>
 
+                    {/* Telegram Admin Notification Setting Box */}
+                    <div className="bg-slate-900 border border-sky-500/40 p-4 rounded-2xl space-y-2">
+                      <div className="flex items-center gap-2 text-sky-400 text-xs font-bold">
+                        <i data-lucide="send" className="w-4 h-4"></i>
+                        <span>Telegram Admin Chat ID Sozlamasi</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 leading-snug">
+                        Buyurtmalar o'zingizning Telegramingizga kelishi uchun Chat ID raqamingizni kiriting:
+                      </p>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Masalan: 123456789"
+                          value={adminChatIdInput}
+                          onChange={(e) => setAdminChatIdInput(e.target.value)}
+                          className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-sky-400"
+                        />
+                        <button
+                          onClick={() => saveAdminChatId(adminChatIdInput)}
+                          className="px-3.5 py-2 bg-sky-500 text-slate-950 text-xs font-black rounded-xl"
+                        >
+                          Saqlash
+                        </button>
+                      </div>
+                    </div>
+
                     {/* Quick Actions */}
                     <div className="grid grid-cols-2 gap-3">
                       <button
@@ -1218,7 +1291,7 @@
                     )}
 
                     <div className="text-center pt-2 pb-8">
-                      <span className="text-[11px] text-slate-500 font-bold tracking-wider block">Versiya 2.4.0 (Supabase Live)</span>
+                      <span className="text-[11px] text-slate-500 font-bold tracking-wider block">Versiya 2.4.0 (Telegram Live)</span>
                       <span className="text-[9px] text-slate-600 block mt-0.5">Karvon Market Engine • 2026</span>
                     </div>
 
@@ -1661,7 +1734,7 @@
                         type="submit"
                         className="w-full py-3 bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-slate-950 font-black text-xs rounded-xl shadow-lg"
                       >
-                        Tasdiqlash va Trek-Kod Olish 📦
+                        Tasdiqlash va Telegram Botga Yuborish 📦
                       </button>
                     </form>
                   </div>
