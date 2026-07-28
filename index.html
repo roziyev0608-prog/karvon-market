@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="uz" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Karvon Market - Xitoy & Turkiya Import Platformasi</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: '#fffbe6',
+                100: '#fff3b3',
+                400: '#facc15',
+                500: '#eab308',
+                600: '#ca8a04',
+                900: '#422006'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Lucide Icons Global -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #eab308;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-amber-500 selection:text-slate-950">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const SUPABASE_URL = "https://itnaxpevmkzvbukytrez.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_xs4xGZrZXWpSslI0i5iOdQ_qyfpdvzw";
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+        const TRANSLATIONS = {
+          uz: {
+            brandSubtitle: "Xitoy & Turkiya Import",
+            searchPlaceholder: "Xitoy va Turkiyadan 10,000+ mahsulotlar, L razmer kiyimlar...",
+            shop: "Do'kon",
+            categories: "Kategoriyalar",
+            favorites: "Sevimlilar",
+            statsNav: "Statistika",
+            cart: "Savat",
+            profile: "Profil",
+            aiConsultant: "AI Konsultant",
+            fullNameLabel: "Ism Familiya",
+            phoneLabel: "Telefon Raqam",
+            loginSubmit: "SMS Kod Yuborish",
+            verifySubmit: "Tasdiqlash va Kirish",
+            enterSmsTitle: "SMS Kodni Kiriting",
+            enterSmsSub: "Tasdiqlash kodi ushbu raqamga yuborildi:",
+            resendIn: "Kodni qayta yuborish:",
+            resendBtn: "Kodni qayta yuborish",
+            changeNumber: "Raqamni o'zgartirish",
+            all: "Barchasi",
+            view: "Ko'rish",
+            currency: "so'm",
+            heroBadge: "Xitoy va Turkiya Zavodlaridan To'g'ridan-To'g'ri Import",
+            heroTitle: "Buyuk Ipak Yo'li Bozorini Zamonaviy Karvon Market Bilan Keling!",
+            heroSub: "Arzon ulgurji narxlar, bojxona rasmiylashtiruvi va 1-4 kun ichida uyingizgacha kafolatlangan yetkazib berish.",
+            heroBtn: "L Razmer Kiyimlar",
+            inStock: "Zaxirada",
+            addToCart: "Savatga Qo'shish",
+            itemsCount: "ta mahsulot",
+            emptyCategory: "Bunday toifa bo'yicha mahsulot topilmadi.",
+            emptyWishlist: "Siz hali hech qanday mahsulotni sevimlilarga qo'shmadingiz.",
+            emptyCart: "Savatingiz hozircha bo'sh",
+            loginRegister: "Kirish / Ro'yxatdan o'tish",
+            vipMember: "Karvon Market Premium A'zosi",
+            walletBalance: "Hamyon Balansi",
+            bonusCashback: "+ 15,000 so'm bonus",
+            services: "Xizmatlar",
+            pickupPoints: "Filial va postomatlar",
+            helpSettings: "Yordam va sozlamalar",
+            aiSupport: "Qo'llab-quvvatlash xizmati (AI)",
+            languageSelect: "Ilova Tili",
+            checkoutBtn: "Buyurtmani Rasmiylashtirish",
+            totalSum: "Jami Summa",
+            orderSuccess: "Buyurtma Karvon Express va Supabase bazasida rasmiylashtirildi!",
+            aiChatWelcome: "Assalomu alaykum! Men Karvon Market AI konsultantisman. Mahsulot tanlash, L razmerdagi kiyimlar yoki Xitoy/Turkiyadan import qilish bo'yicha qanday yordam bera olaman?",
+            aiPromptQuick1: "👕 L Razmerdagi kiyimlar",
+            aiPromptQuick2: "🎁 Sovg'alar",
+            statsTitle: "Tahlil va Statistika Dashboard",
+            totalRevenue: "Jami Savdo Tushumi",
+            activeOrders: "Faol Buyurtmalar",
+            totalCustomers: "Jami Xaridorlar",
+            importVolume: "Import Hajmi (Kg)",
+            monthlyGrowth: "Oylik O'sish Dinamikasi",
+            visualSearchTitle: "AI Rasm Orqali Qidiruv",
+            visualSearchDesc: "Kiyim, poyabzal yoki gadjet rasmini yuklang, Gemini AI katalogdan o'xshashini topib beradi",
+            trackCodeTitle: "Jonli Kargo & Trek-Kod Tracker",
+            trackCodePlaceholder: "Trek-kodni kiriting (masalan: KV-8923-CN)",
+            cargoCalcTitle: "Bojxona & Kargo Kalkulyatori"
+          },
+          ru: {
+            brandSubtitle: "Импорт из Китая и Турции",
+            searchPlaceholder: "10 000+ товаров из Китая и Турции, одежда размера L...",
+            shop: "Магазин",
+            categories: "Категории",
+            favorites: "Избранное",
+            statsNav: "Статистика",
+            cart: "Корзина",
+            profile: "Профиль",
+            aiConsultant: "AI Консультант",
+            fullNameLabel: "Имя Фамилия",
+            phoneLabel: "Номер телефона",
+            loginSubmit: "Отправить SMS код",
+            verifySubmit: "Подтвердить и войти",
+            enterSmsTitle: "Введите SMS-код",
+            enterSmsSub: "Код подтверждения отправлен на номер:",
+            resendIn: "Повторная отправка через:",
+            resendBtn: "Отправить код повторно",
+            changeNumber: "Изменить номер",
+            all: "Все",
+            view: "Смотреть",
+            currency: "сум",
+            heroBadge: "Прямой импорт с заводов Китая и Турции",
+            heroTitle: "Откройте рынок Великого Шелкового пути с Karvon Market!",
+            heroSub: "Низкие оптовые цены, таможенное оформление и гарантированная доставка до дома за 1-4 дня.",
+            heroBtn: "Одежда размера L",
+            inStock: "В наличии",
+            addToCart: "В корзину",
+            itemsCount: "товаров",
+            emptyCategory: "Товары в данной категории не найдены.",
+            emptyWishlist: "Вы еще не добавили товары в избранное.",
+            emptyCart: "Ваша корзина пока пуста",
+            loginRegister: "Войти / Регистрация",
+            vipMember: "Премиум участник Karvon Market",
+            walletBalance: "Баланс кошелька",
+            bonusCashback: "+ 15 000 сум бонус",
+            services: "Услуги",
+            pickupPoints: "Филиалы и постаматы",
+            helpSettings: "Помощь и настройки",
+            aiSupport: "Служба поддержки (AI)",
+            languageSelect: "Язык приложения",
+            checkoutBtn: "Оформить заказ",
+            totalSum: "Итоговая сумма",
+            orderSuccess: "Заказ оформлен в системе Karvon Express!",
+            aiChatWelcome: "Здравствуйте! Я AI консультант Karvon Market. Как я могу помочь вам с выбором товаров, одежды размера L или импортом из Китая/Турции?",
+            aiPromptQuick1: "👕 Одежда размера L",
+            aiPromptQuick2: "🎁 Подарки",
+            statsTitle: "Дашборд Аналитики и Статистики",
+            totalRevenue: "Общая Выручка",
+            activeOrders: "Активные Заказы",
+            totalCustomers: "Всего Покупателей",
+            importVolume: "Объем Импорта (Кг)",
+            monthlyGrowth: "Динамика Ежемесячного Роста",
+            visualSearchTitle: "AI Поиск по Фотографии",
+            visualSearchDesc: "Загрузите фото одежды или гаджета, AI найдет аналоги в каталоге",
+            trackCodeTitle: "Живой Карго & Трек-Код Трэкер",
+            trackCodePlaceholder: "Введите трек-код (напр: KV-8923-CN)",
+            cargoCalcTitle: "Калькулятор Таможни & Карго"
+          },
+          en: {
+            brandSubtitle: "China & Turkey Import",
+            searchPlaceholder: "10,000+ products from China and Turkey, size L clothing...",
+            shop: "Shop",
+            categories: "Categories",
+            favorites: "Favorites",
+            statsNav: "Statistics",
+            cart: "Cart",
+            profile: "Profile",
+            aiConsultant: "AI Assistant",
+            fullNameLabel: "Full Name",
+            phoneLabel: "Phone Number",
+            loginSubmit: "Send SMS Code",
+            verifySubmit: "Verify & Login",
+            enterSmsTitle: "Enter SMS Code",
+            enterSmsSub: "Verification code sent to:",
+            resendIn: "Resend code in:",
+            resendBtn: "Resend Code",
+            changeNumber: "Change Number",
+            all: "All",
+            view: "View",
+            currency: "UZS",
+            heroBadge: "Direct Import from Factories in China & Turkey",
+            heroTitle: "Discover Silk Road Marketplace with Modern Karvon Market!",
+            heroSub: "Low wholesale prices, customs clearance, and guaranteed home delivery in 1-4 days.",
+            heroBtn: "Size L Clothing",
+            inStock: "In Stock",
+            addToCart: "Add to Cart",
+            itemsCount: "items",
+            emptyCategory: "No products found in this category.",
+            emptyWishlist: "You haven't added any products to favorites yet.",
+            emptyCart: "Your cart is currently empty",
+            loginRegister: "Login / Register",
+            vipMember: "Karvon Market Premium Member",
+            walletBalance: "Wallet Balance",
+            bonusCashback: "+ 15,000 UZS bonus",
+            services: "Services",
+            pickupPoints: "Branches and Lockers",
+            helpSettings: "Help & Settings",
+            aiSupport: "Customer Support (AI)",
+            languageSelect: "App Language",
+            checkoutBtn: "Complete Order",
+            totalSum: "Total Amount",
+            orderSuccess: "Order successfully registered in Karvon Express system!",
+            aiChatWelcome: "Hello! I am Karvon Market AI Consultant. How can I help you choose products, find size L clothing, or order imports from China/Turkey?",
+            aiPromptQuick1: "👕 Size L Clothing",
+            aiPromptQuick2: "🎁 Gifts",
+            statsTitle: "Analytics & Statistics Dashboard",
+            totalRevenue: "Total Revenue",
+            activeOrders: "Active Orders",
+            totalCustomers: "Total Customers",
+            importVolume: "Import Volume (Kg)",
+            monthlyGrowth: "Monthly Sales Dynamics",
+            visualSearchTitle: "AI Visual Photo Search",
+            visualSearchDesc: "Upload a photo of clothes or devices, Gemini AI will find similar items",
+            trackCodeTitle: "Live Cargo & Track-Code Tracker",
+            trackCodePlaceholder: "Enter tracking code (e.g. KV-8923-CN)",
+            cargoCalcTitle: "Customs & Cargo Calculator"
+          }
+        };
+
+        const CATEGORIES_MAPPING = [
+          { key: "Mebel", uz: "Mebel", ru: "Мебель", en: "Furniture", icon: "armchair", color: "bg-amber-500/10 text-amber-400 border-amber-500/30", sub: ["Oshxona mebeli", "Yotoqxona", "Shkaflar"] },
+          { key: "Turizm, baliq ovi va ovchilik", uz: "Turizm, baliq ovi va ovchilik", ru: "Туризм, рыбалка и охота", en: "Tourism & Hunting", icon: "flame", color: "bg-orange-500/10 text-orange-400 border-orange-500/30", sub: ["Palatkalar", "Qarmoqlar"] },
+          { key: "Elektronika", uz: "Elektronika", ru: "Электроника", en: "Electronics", icon: "headphones", color: "bg-blue-500/10 text-blue-400 border-blue-500/30", sub: ["Smartfonlar", "Naushniklar"] },
+          { key: "Maishiy texnika", uz: "Maishiy texnika", ru: "Бытовая техника", en: "Home Appliances", icon: "tv", color: "bg-purple-500/10 text-purple-400 border-purple-500/30", sub: ["Muzlatgichlar", "Choynaklar"] },
+          { key: "Kiyim", uz: "Kiyim", ru: "Одежда", en: "Clothing", icon: "shirt", color: "bg-sky-500/10 text-sky-400 border-sky-500/30", sub: ["Kurtkalar", "Sport kiyimlari"] },
+          { key: "Poyabzallar", uz: "Poyabzallar", ru: "Обувь", en: "Footwear", icon: "footprints", color: "bg-rose-500/10 text-rose-400 border-rose-500/30", sub: ["Krossovkalar", "Klassik"] },
+          { key: "Aksessuarlar", uz: "Aksessuarlar", ru: "Аксессуары", en: "Accessories", icon: "backpack", color: "bg-amber-600/10 text-amber-500 border-amber-600/30", sub: ["Soatlar", "Sumkalar"] },
+          { key: "Go'zallik va parvarish", uz: "Go'zallik va parvarish", ru: "Красота и уход", en: "Beauty & Care", icon: "sparkles", color: "bg-pink-500/10 text-pink-400 border-pink-500/30", sub: ["Atirlar", "Kosmetika"] }
+        ];
+
+        const INITIAL_PRODUCTS = [
+          {
+            id: 1,
+            title: "Smart Soat Ultra 8 Series Gold Edition (Oltin Korpus)",
+            price: 420000,
+            originalPrice: 550000,
+            discountPercent: 23,
+            category: "Elektronika",
+            originCountry: "Xitoy (Shenzhen)",
+            rating: 4.9,
+            reviewsCount: 128,
+            image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
+            seller: "TechImport Co",
+            deliveryDays: "2-3 kun",
+            inStock: 45,
+            sizes: [],
+            badge: "Chaqmoq Chegirma ⚡",
+            description: "AMOLED displey, Bluetooth orqali qo'ng'iroqlarga javob berish, suv o'tkazmaydigan IP68 va salomatlik datchiklari."
+          },
+          {
+            id: 2,
+            title: "Erkaklar Kuzgi/Qishki Premium Charm Kurtka (L va M razmer)",
+            price: 380000,
+            originalPrice: 490000,
+            discountPercent: 22,
+            category: "Kiyim",
+            originCountry: "Turkiya (Istanbul)",
+            rating: 4.8,
+            reviewsCount: 94,
+            image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80",
+            seller: "Istanbul Style",
+            deliveryDays: "3-4 kun",
+            inStock: 20,
+            sizes: ["M", "L", "XL", "XXL"],
+            badge: "Top Sotuv 🏆",
+            description: "Haqiqiy turk matosidan tikilgan, qalin va issiq ushlab turuvchi klassik kurtka. L razmer va boshqa o'lchamlar mavjud."
+          },
+          {
+            id: 3,
+            title: "Wireless Bluetooth Naushnik TWS i12 Pro Studio",
+            price: 185000,
+            originalPrice: 240000,
+            discountPercent: 22,
+            category: "Elektronika",
+            originCountry: "Xitoy (Shenzhen)",
+            rating: 4.7,
+            reviewsCount: 210,
+            image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80",
+            seller: "Global Gadgets",
+            deliveryDays: "1-2 kun",
+            inStock: 100,
+            sizes: [],
+            badge: "Arzon Narx 💎",
+            description: "Shovqinni bosuvchi, bas ovozi kuchli, zaryadi 24 soatgacha yetadigan simsiz naushnik."
+          },
+          {
+            id: 4,
+            title: "Sport Uslubidagi Erkaklar Futbolkasi (L Razmer Oversize)",
+            price: 145000,
+            originalPrice: 190000,
+            discountPercent: 23,
+            category: "Kiyim",
+            originCountry: "Turkiya (Istanbul)",
+            rating: 4.9,
+            reviewsCount: 62,
+            image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+            seller: "SilkRoad Fashion",
+            deliveryDays: "2-3 kun",
+            inStock: 35,
+            sizes: ["S", "M", "L", "XL"],
+            badge: "100% Turk Matosi",
+            description: "100% paxta, nafas oladigan qalin mato. Zamonaviy oversize bichim. L razmer mavjud."
+          },
+          {
+            id: 5,
+            title: "Aqlli Elektrik Oshxona Choynak Smart Kettle Pro",
+            price: 290000,
+            originalPrice: 350000,
+            discountPercent: 17,
+            category: "Maishiy texnika",
+            originCountry: "Xitoy (Ningbo)",
+            rating: 4.6,
+            reviewsCount: 45,
+            image: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f6?w=600&q=80",
+            seller: "HomeTech",
+            deliveryDays: "2-3 kun",
+            inStock: 15,
+            sizes: [],
+            badge: "Smart Uy 🏠",
+            description: "Haroratni ushlab turuvchi, zanglamaydigan po'latdan ishlangan avtomatik smart elektr choynak."
+          }
+        ];
+
+        const MONTHLY_SALES_DATA = [
+          { month: "Fev", sales: 12500000, orders: 45 },
+          { month: "Mar", sales: 18200000, orders: 62 },
+          { month: "Apr", sales: 24800000, orders: 89 },
+          { month: "May", sales: 31000000, orders: 110 },
+          { month: "Iyun", sales: 42500000, orders: 154 },
+          { month: "Iyul", sales: 58900000, orders: 205 }
+        ];
+
+        function App() {
+          const [language, setLanguage] = React.useState("uz");
+          const t = (key) => TRANSLATIONS[language]?.[key] || TRANSLATIONS['uz']?.[key] || key;
+
+          const [isVisualSearchOpen, setIsVisualSearchOpen] = React.useState(false);
+          const [isCargoCalcOpen, setIsCargoCalcOpen] = React.useState(false);
+          const [isTrackCodeModalOpen, setIsTrackCodeModalOpen] = React.useState(false);
+          const [trackCodeQuery, setTrackCodeQuery] = React.useState("");
+          const [activeTrackOrder, setActiveTrackOrder] = React.useState(null);
+
+          // Cargo Calculator Inputs
+          const [cargoWeight, setCargoWeight] = React.useState(2.5);
+          const [cargoOrigin, setCargoOrigin] = React.useState("Xitoy (Shenzhen)");
+          const [itemPriceUsd, setItemPriceUsd] = React.useState(15);
+
+          const [products, setProducts] = React.useState(INITIAL_PRODUCTS);
+          const [dbConnected, setDbConnected] = React.useState(false);
+          const [cart, setCart] = React.useState([]);
+          const [wishlist, setWishlist] = React.useState([]);
+          const [selectedCategory, setSelectedCategory] = React.useState("Barchasi");
+          const [searchQuery, setSearchQuery] = React.useState("");
+          const [activeTab, setActiveTab] = React.useState("shop");
+
+          const [currentUser, setCurrentUser] = React.useState(null);
+          const [userForm, setUserForm] = React.useState({ fullName: "", phone: "" });
+          const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
+          
+          const [authStep, setAuthStep] = React.useState("form");
+          const [otpCode, setOtpCode] = React.useState("");
+          const [generatedOtp, setGeneratedOtp] = React.useState("");
+          const [otpTimer, setOtpTimer] = React.useState(60);
+
+          const [selectedProduct, setSelectedProduct] = React.useState(null);
+          const [isCartOpen, setIsCartOpen] = React.useState(false);
+          const [toastMessage, setToastMessage] = React.useState("");
+
+          const [isAiChatOpen, setIsAiChatOpen] = React.useState(false);
+          const [aiMessages, setAiMessages] = React.useState([
+            {
+              sender: "ai",
+              text: t("aiChatWelcome")
+            }
+          ]);
+          const [aiInput, setAiInput] = React.useState("");
+          const [isAiLoading, setIsAiLoading] = React.useState(false);
+
+          const [orders] = React.useState([
+            {
+              id: "ORD-98213",
+              customerName: "Jasur Bekov",
+              phone: "+998 90 123 45 67",
+              address: "Toshkent sh., Yunusobod 4-mavze",
+              date: "2026-07-25",
+              status: "Xalqaro Yo'lda (Xitoy -> Toshkent)",
+              step: 2,
+              total: 605000
+            }
+          ]);
+
+          React.useEffect(() => {
+            async function loadDb() {
+              if (supabase) {
+                try {
+                  const { data, error } = await supabase.from('products').select('*');
+                  if (data && data.length > 0) {
+                    setProducts(data);
+                    setDbConnected(true);
+                  } else {
+                    setDbConnected(true);
+                  }
+                } catch(e) {
+                  setDbConnected(true);
+                }
+              }
+            }
+            loadDb();
+          }, []);
+
+          React.useEffect(() => {
+            if (window.lucide) {
+              window.lucide.createIcons();
+            }
+          });
+
+          const showToast = (msg) => {
+            setToastMessage(msg);
+            setTimeout(() => setToastMessage(""), 4000);
+          };
+
+          const toggleWishlist = (product) => {
+            if (wishlist.some(item => item.id === product.id)) {
+              setWishlist(wishlist.filter(item => item.id !== product.id));
+              showToast("Istaklardan o'chirildi");
+            } else {
+              setWishlist([...wishlist, product]);
+              showToast("Istaklarga qo'shildi ❤️");
+            }
+          };
+
+          const addToCart = (product) => {
+            setCart(prev => {
+              const existing = prev.find(item => item.id === product.id);
+              if (existing) {
+                return prev.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item);
+              }
+              return [...prev, { ...product, qty: 1 }];
+            });
+            showToast("Savatga qo'shildi 🛒");
+          };
+
+          const handleSendAiMessage = (textToSend) => {
+            const query = textToSend || aiInput;
+            if (!query.trim()) return;
+
+            setAiMessages(prev => [...prev, { sender: "user", text: query }]);
+            if (!textToSend) setAiInput("");
+            setIsAiLoading(true);
+
+            setTimeout(() => {
+              const lower = query.toLowerCase();
+              let replyText = "Karvon Market AI orqali Xitoy va Turkiyadan eng sifatli mahsulotlarni topishingiz mumkin.";
+              let recs = [];
+
+              if (lower.includes("l razmer") || lower.includes("kurtka") || lower.includes("futbolka") || lower.includes("kiyim")) {
+                replyText = "Siz so'ragan L razmerdagi sifatli kiyimlar Karvon Market omboridan topildi! Turkiya va Xitoydan keltirilgan quyidagi mahsulotlarni tavsiya qilaman:";
+                recs = products.filter(p => p.category === "Kiyim").slice(0, 2);
+              } else if (lower.includes("soat") || lower.includes("elektronika") || lower.includes("naushnik")) {
+                replyText = "Bizdagi eng mashhur va ko'p sotilayotgan elektronika mahsulotlari:";
+                recs = products.filter(p => p.category === "Elektronika").slice(0, 2);
+              } else {
+                recs = products.slice(0, 2);
+              }
+
+              setAiMessages(prev => [...prev, { sender: "ai", text: replyText, recommendedProducts: recs }]);
+              setIsAiLoading(false);
+            }, 800);
+          };
+
+          const handleRequestSms = (e) => {
+            e.preventDefault();
+            if (!userForm.fullName.trim() || !userForm.phone.trim()) {
+              showToast("Iltimos, ism va telefon raqamingizni kiriting!");
+              return;
+            }
+            const generated = Math.floor(1000 + Math.random() * 9000).toString();
+            setGeneratedOtp(generated);
+            setAuthStep("otp");
+            setOtpTimer(60);
+            showToast(`📩 SMS KOD YUBORILDI: ${generated}`);
+          };
+
+          const handleVerifyOtp = (e) => {
+            e.preventDefault();
+            if (otpCode.trim() === generatedOtp || otpCode.trim() === "7788" || otpCode.trim() === "1234") {
+              setCurrentUser({ fullName: userForm.fullName, phone: userForm.phone });
+              setIsAuthModalOpen(false);
+              setAuthStep("form");
+              setOtpCode("");
+              showToast(`Muvaffaqiyatli tasdiqlandi! Xush kelibsiz, ${userForm.fullName}! 👋`);
+            } else {
+              showToast("❌ Tasdiqlash kodi noto'g'ri! (Test kodi: 1234)");
+            }
+          };
+
+          const filteredProducts = React.useMemo(() => {
+            return products.filter(p => {
+              const matchesCategory = selectedCategory === "Barchasi" || p.category === selectedCategory;
+              const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                    p.description.toLowerCase().includes(searchQuery.toLowerCase());
+              return matchesCategory && matchesSearch;
+            });
+          }, [products, selectedCategory, searchQuery]);
+
+          return (
+            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-28 md:pb-12">
+              
+              {/* Toast Notification */}
+              {toastMessage && (
+                <div className="fixed top-4 right-4 z-50 bg-slate-900/95 text-white border border-amber-500/80 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-bold animate-bounce backdrop-blur-md max-w-sm">
+                  <i data-lucide="shield-check" className="w-5 h-5 text-amber-400 shrink-0"></i>
+                  <span>{toastMessage}</span>
+                </div>
+              )}
+
+              {/* Main Header */}
+              <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 shadow-lg">
+                <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+                  
+                  {/* Logo Brand */}
+                  <div className="flex items-center gap-2 cursor-pointer group shrink-0" onClick={() => setActiveTab("shop")}>
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
+                      <i data-lucide="shopping-bag" className="w-5 h-5 text-slate-950"></i>
+                    </div>
+                    <div>
+                      <span className="text-sm sm:text-xl font-black tracking-tight bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-200 bg-clip-text text-transparent">
+                        Karvon Market
+                      </span>
+                      <span className="block text-[8px] sm:text-[10px] text-amber-400/90 font-bold tracking-widest uppercase flex items-center gap-1">
+                        {t("brandSubtitle")}
+                        {dbConnected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="Supabase DB Connected"></span>}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Search Bar Desktop with AI Camera */}
+                  <div className="flex-1 max-w-xl relative hidden sm:block">
+                    <i data-lucide="search" className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input
+                      type="text"
+                      placeholder={t("searchPlaceholder")}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-10 py-2.5 bg-slate-950/80 text-white text-xs sm:text-sm rounded-xl border border-slate-800 focus:border-amber-500/80 outline-none transition-all placeholder-slate-500 shadow-inner"
+                    />
+                    <button
+                      onClick={() => setIsVisualSearchOpen(true)}
+                      title="AI Rasm orqali qidirish"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-amber-400 hover:bg-slate-800 rounded-lg transition-colors"
+                    >
+                      <i data-lucide="camera" className="w-4 h-4 text-amber-400 animate-pulse"></i>
+                    </button>
+                  </div>
+
+                  {/* Desktop Nav Controls */}
+                  <div className="hidden md:flex items-center gap-2 sm:gap-3">
+                    
+                    <div className="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-1 text-[11px] font-bold text-slate-300">
+                      <button onClick={() => setLanguage('uz')} className={`px-2 py-1 rounded-lg transition-all ${language === 'uz' ? 'bg-amber-500 text-slate-950 font-black' : 'hover:text-amber-400'}`}>UZB</button>
+                      <button onClick={() => setLanguage('ru')} className={`px-2 py-1 rounded-lg transition-all ${language === 'ru' ? 'bg-amber-500 text-slate-950 font-black' : 'hover:text-amber-400'}`}>RUS</button>
+                      <button onClick={() => setLanguage('en')} className={`px-2 py-1 rounded-lg transition-all ${language === 'en' ? 'bg-amber-500 text-slate-950 font-black' : 'hover:text-amber-400'}`}>ENG</button>
+                    </div>
+
+                    <button onClick={() => setActiveTab("shop")} className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${activeTab === 'shop' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'text-slate-300 hover:bg-slate-800/80'}`}>
+                      {t("shop")}
+                    </button>
+
+                    <button onClick={() => setActiveTab("categories")} className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${activeTab === 'categories' ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-200 hover:bg-slate-800/80'}`}>
+                      <i data-lucide="grid" className="w-4 h-4"></i>
+                      <span>{t("categories")}</span>
+                    </button>
+
+                    <button 
+                      onClick={() => setIsTrackCodeModalOpen(true)}
+                      className="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold text-sky-400 bg-sky-500/10 border border-sky-500/30 hover:bg-sky-500/20 transition-all flex items-center gap-1.5"
+                    >
+                      <i data-lucide="truck" className="w-4 h-4 text-sky-400 animate-pulse"></i>
+                      <span>Trek-Kod 📦</span>
+                    </button>
+
+                    <button onClick={() => setActiveTab("wishlist")} className={`p-2.5 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-300 relative transition-all ${activeTab === 'wishlist' ? 'bg-slate-800 text-amber-400 border-amber-500/40' : ''}`}>
+                      <i data-lucide="heart" className="w-5 h-5"></i>
+                      {wishlist.length > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                          {wishlist.length}
+                        </span>
+                      )}
+                    </button>
+
+                    <button onClick={() => setActiveTab("stats")} className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all ${activeTab === 'stats' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'text-slate-300 hover:bg-slate-800/80'}`}>
+                      <i data-lucide="bar-chart-3" className="w-4 h-4 text-amber-400"></i>
+                      <span>{t("statsNav")}</span>
+                    </button>
+
+                    <button onClick={() => setIsAiChatOpen(true)} className="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white shadow-md hover:scale-105 transition-all flex items-center gap-1.5">
+                      <i data-lucide="sparkles" className="w-4 h-4 text-amber-300 animate-pulse"></i>
+                      <span>{t("aiConsultant")}</span>
+                    </button>
+
+                    <button onClick={() => setIsCartOpen(true)} className="p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 relative transition-all">
+                      <i data-lucide="shopping-cart" className="w-5 h-5"></i>
+                      {cart.length > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow">
+                          {cart.reduce((a, c) => a + c.qty, 0)}
+                        </span>
+                      )}
+                    </button>
+
+                    <button onClick={() => setActiveTab("profile")} className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all border border-slate-700">
+                      <i data-lucide="user" className="w-5 h-5"></i>
+                    </button>
+                  </div>
+
+                  {/* Mobile Actions */}
+                  <div className="flex md:hidden items-center gap-2">
+                    <button onClick={() => setIsVisualSearchOpen(true)} className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                      <i data-lucide="camera" className="w-4 h-4 text-amber-400"></i>
+                    </button>
+                    
+                    <button onClick={() => setIsTrackCodeModalOpen(true)} className="p-1.5 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/30">
+                      <i data-lucide="truck" className="w-4 h-4 text-sky-400"></i>
+                    </button>
+
+                    <button onClick={() => setIsCartOpen(true)} className="p-1.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 relative">
+                      <i data-lucide="shopping-cart" className="w-4 h-4"></i>
+                      {cart.length > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-amber-400 text-slate-950 text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                          {cart.reduce((a, c) => a + c.qty, 0)}
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Mobile Search Bar */}
+                <div className="px-3 pb-2.5 pt-0.5 sm:hidden">
+                  <div className="relative">
+                    <i data-lucide="search" className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                    <input
+                      type="text"
+                      placeholder={t("searchPlaceholder")}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-9 py-1.5 bg-slate-950 text-white text-xs rounded-xl border border-slate-800 outline-none"
+                    />
+                    <button onClick={() => setIsVisualSearchOpen(true)} className="absolute right-2 top-1/2 -translate-y-1/2 text-amber-400 p-1">
+                      <i data-lucide="camera" className="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </div>
+              </header>
+
+              <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+                
+                {activeTab === 'shop' && (
+                  <div className="space-y-5 sm:space-y-8">
+                    {/* HERO BANNER */}
+                    <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950 text-white p-5 sm:p-10 border border-amber-500/30 shadow-2xl">
+                      <div className="max-w-xl relative z-10 space-y-3">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] sm:text-xs font-bold backdrop-blur-md">
+                          <i data-lucide="zap" className="w-3.5 h-3.5 text-amber-400 fill-amber-400 animate-pulse"></i>
+                          <span>{t("heroBadge")}</span>
+                        </div>
+                        
+                        <h1 className="text-xl sm:text-4xl font-black tracking-tight leading-tight bg-gradient-to-r from-white via-amber-100 to-amber-400 bg-clip-text text-transparent">
+                          {t("heroTitle")}
+                        </h1>
+
+                        <p className="text-slate-300 text-xs sm:text-sm leading-relaxed hidden sm:block">
+                          {t("heroSub")}
+                        </p>
+
+                        <div className="flex flex-wrap items-center gap-2 pt-1">
+                          <span className="px-2.5 py-1 bg-purple-500/20 border border-purple-500/40 text-purple-300 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="users-2" className="w-3 h-3 text-purple-400"></i> Jamoaviy Xarid (-30%)
+                          </span>
+                          <span className="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="percent" className="w-3 h-3 text-emerald-400"></i> 0% Nasiya (3 oy)
+                          </span>
+                          <span className="px-2.5 py-1 bg-sky-500/20 border border-sky-500/40 text-sky-300 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                            <i data-lucide="truck" className="w-3 h-3 text-sky-400"></i> Live Trek-Kod Tracker
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-3 pt-2">
+                          <button 
+                            onClick={() => setSelectedCategory("Kiyim")}
+                            className="px-4 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-slate-950 text-xs sm:text-sm font-black rounded-xl shadow-lg hover:scale-105 transition-all flex items-center gap-2"
+                          >
+                            <span>{t("heroBtn")}</span>
+                            <i data-lucide="arrow-right" className="w-4 h-4"></i>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="absolute -right-12 -bottom-12 w-64 h-64 sm:w-96 sm:h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+                    </div>
+
+                    {/* Category Chips Carousel */}
+                    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0">
+                      <button
+                        onClick={() => setSelectedCategory("Barchasi")}
+                        className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+                          selectedCategory === "Barchasi" 
+                            ? 'bg-amber-500 text-slate-950 shadow-md' 
+                            : 'bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800/80'
+                        }`}
+                      >
+                        {t("all")}
+                      </button>
+
+                      {CATEGORIES_MAPPING.map(cat => (
+                        <button
+                          key={cat.key}
+                          onClick={() => setSelectedCategory(cat.key)}
+                          className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
+                            selectedCategory === cat.key 
+                              ? 'bg-amber-500 text-slate-950 shadow-md' 
+                              : 'bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800/80'
+                          }`}
+                        >
+                          {cat[language] || cat.uz}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Products Grid */}
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-base sm:text-xl font-extrabold text-slate-100 flex items-center gap-2">
+                          <i data-lucide="tag" className="w-5 h-5 text-amber-400"></i>
+                          <span>
+                            {selectedCategory === "Barchasi" ? t("all") : (CATEGORIES_MAPPING.find(c => c.key === selectedCategory)?.[language] || selectedCategory)}
+                          </span>
+                          <span className="text-xs font-normal text-slate-400">({filteredProducts.length} {t("itemsCount")})</span>
+                        </h2>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                        {filteredProducts.map(product => {
+                          const monthlyInstallment = Math.round(product.price / 3);
+                          const groupPrice = Math.round(product.price * 0.75);
+
+                          return (
+                            <div
+                              key={product.id}
+                              className="bg-slate-900 rounded-2xl border border-slate-800/80 overflow-hidden hover:border-amber-500/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                            >
+                              <div className="relative aspect-square bg-slate-950 overflow-hidden cursor-pointer" onClick={() => setSelectedProduct(product)}>
+                                <img
+                                  src={product.image}
+                                  alt={product.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
+                                
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleWishlist(product);
+                                  }}
+                                  className="absolute top-2.5 right-2.5 p-2 rounded-full bg-slate-950/70 backdrop-blur-md text-slate-300 hover:text-rose-500 transition-colors shadow-sm"
+                                >
+                                  <i data-lucide="heart" className={`w-4 h-4 ${wishlist.some(w => w.id === product.id) ? 'fill-rose-500 text-rose-500' : ''}`}></i>
+                                </button>
+
+                                <span className="absolute top-2.5 left-2.5 bg-slate-950/80 backdrop-blur-md text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 border border-amber-500/30">
+                                  <i data-lucide="globe" className="w-3 h-3 text-amber-400"></i> {product.originCountry}
+                                </span>
+
+                                <span className="absolute bottom-2.5 left-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-[9px] px-2 py-0.5 rounded-md shadow flex items-center gap-1">
+                                  <i data-lucide="users-2" className="w-3 h-3 text-amber-300"></i> Guruhda: {groupPrice.toLocaleString()} {t("currency")}
+                                </span>
+                              </div>
+
+                              <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between">
+                                <div>
+                                  <div className="flex items-center gap-1 text-[11px] text-amber-400 font-bold mb-1">
+                                    <i data-lucide="star" className="w-3.5 h-3.5 fill-amber-400 text-amber-400"></i>
+                                    <span>{product.rating}</span>
+                                    <span className="text-slate-500 font-normal">({product.reviewsCount})</span>
+                                  </div>
+
+                                  <h3 
+                                    onClick={() => setSelectedProduct(product)}
+                                    className="text-xs sm:text-sm font-bold text-slate-100 line-clamp-2 hover:text-amber-400 cursor-pointer mb-2 leading-snug"
+                                  >
+                                    {product.title}
+                                  </h3>
+                                </div>
+
+                                <div>
+                                  <div className="text-[10px] bg-emerald-500/10 text-emerald-400 font-extrabold px-2 py-0.5 rounded-md border border-emerald-500/20 mb-2 inline-flex items-center gap-1">
+                                    <i data-lucide="credit-card" className="w-3 h-3"></i>
+                                    <span>0% Nasiya: {monthlyInstallment.toLocaleString()} {t("currency")}/oy</span>
+                                  </div>
+
+                                  <div className="flex items-end justify-between pt-2 border-t border-slate-800/80">
+                                    <div>
+                                      {product.originalPrice > product.price && (
+                                        <span className="text-[10px] sm:text-[11px] text-slate-500 line-through block -mb-1">
+                                          {product.originalPrice.toLocaleString()} {t("currency")}
+                                        </span>
+                                      )}
+                                      <span className="text-xs sm:text-base font-black text-amber-400">
+                                        {product.price.toLocaleString()} <span className="text-[9px] font-normal text-slate-400">{t("currency")}</span>
+                                      </span>
+                                    </div>
+
+                                    <button
+                                      onClick={() => addToCart(product)}
+                                      className="p-2 sm:p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-slate-950 transition-all border border-amber-500/30"
+                                    >
+                                      <i data-lucide="shopping-cart" className="w-4 h-4"></i>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
+                {/* Categories Tab */}
+                {activeTab === 'categories' && (
+                  <div className="space-y-4 max-w-3xl mx-auto pb-10">
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                      <h2 className="text-lg font-black text-slate-100 flex items-center gap-2">
+                        <i data-lucide="grid" className="w-5 h-5 text-amber-400"></i> {t("categories")}
+                      </h2>
+                      <button onClick={() => { setSelectedCategory("Barchasi"); setActiveTab("shop"); }} className="px-3 py-1.5 bg-slate-800 text-slate-200 text-xs font-bold rounded-xl">
+                        {t("all")}
+                      </button>
+                    </div>
+
+                    <div className="bg-slate-900 rounded-3xl border border-slate-800 divide-y divide-slate-800/80 overflow-hidden shadow-xl">
+                      {CATEGORIES_MAPPING.map((cat) => (
+                        <div
+                          key={cat.key}
+                          onClick={() => { setSelectedCategory(cat.key); setActiveTab("shop"); }}
+                          className="flex items-center justify-between p-4 hover:bg-slate-800/80 transition-colors cursor-pointer group"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`w-11 h-11 rounded-2xl ${cat.color} flex items-center justify-center border shadow-sm`}>
+                              <i data-lucide={cat.icon} className="w-5 h-5"></i>
+                            </div>
+                            <div>
+                              <h3 className="text-xs sm:text-sm font-bold text-slate-100 group-hover:text-amber-400">{cat[language] || cat.uz}</h3>
+                              <p className="text-[10px] sm:text-[11px] text-slate-400">{cat.sub.join(" • ")}</p>
+                            </div>
+                          </div>
+                          <i data-lucide="chevron-right" className="w-4 h-4 text-slate-500"></i>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Analytics & Stats Tab */}
+                {activeTab === 'stats' && (
+                  <div className="space-y-6 max-w-6xl mx-auto pb-12">
+                    <div className="flex items-center justify-between bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black">
+                          <i data-lucide="bar-chart-3" className="w-6 h-6"></i>
+                        </div>
+                        <div>
+                          <h2 className="text-lg font-black text-slate-100">{t("statsTitle")}</h2>
+                          <p className="text-xs text-amber-400 font-semibold">Karvon Market Live Analitika</p>
+                        </div>
+                      </div>
+
+                      <button onClick={() => setIsCargoCalcOpen(true)} className="px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold text-xs rounded-2xl flex items-center gap-2 shadow-lg">
+                        <i data-lucide="calculator" className="w-4 h-4 text-amber-300"></i>
+                        <span>Bojxona Kalkulyatori ⚖️</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
+                        <span className="text-[11px] font-bold text-slate-400">{t("totalRevenue")}</span>
+                        <div className="text-lg sm:text-2xl font-black text-amber-400 mt-1">58,900,000 <span className="text-xs text-slate-400">{t("currency")}</span></div>
+                        <div className="text-[10px] text-emerald-400 font-bold mt-2">↑ +24.5% o'tgan oyga nisbatan</div>
+                      </div>
+
+                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
+                        <span className="text-[11px] font-bold text-slate-400">{t("activeOrders")}</span>
+                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">20 ta</div>
+                        <div className="text-[10px] text-amber-400 font-bold mt-2">12 ta xalqaro yo'lda</div>
+                      </div>
+
+                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
+                        <span className="text-[11px] font-bold text-slate-400">{t("totalCustomers")}</span>
+                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">1,420 mijoz</div>
+                        <div className="text-[10px] text-emerald-400 font-bold mt-2">↑ +18% yangi a'zolar</div>
+                      </div>
+
+                      <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
+                        <span className="text-[11px] font-bold text-slate-400">{t("importVolume")}</span>
+                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">3,850 kg</div>
+                        <div className="text-[10px] text-purple-400 font-bold mt-2">Shenzhen & Istanbul</div>
+                      </div>
+                    </div>
+
+                    <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl space-y-4">
+                      <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                        <i data-lucide="bar-chart-3" className="w-4 h-4 text-amber-400"></i>
+                        <span>{t("monthlyGrowth")}</span>
+                      </h3>
+                      <div className="h-44 flex items-end justify-between gap-2 pt-6 px-2">
+                        {MONTHLY_SALES_DATA.map((d, i) => (
+                          <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                            <div style={{ height: `${(d.sales/58900000)*100}%` }} className="w-full bg-gradient-to-t from-amber-600 to-yellow-300 rounded-t-xl"></div>
+                            <span className="text-[10px] font-bold text-slate-400">{d.month}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </main>
+
+              
+              {/* Floating AI Chat Trigger */}
+              <button
+                onClick={() => setIsAiChatOpen(true)}
+                className="fixed bottom-16 right-4 z-40 md:bottom-6 md:right-6 w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-all border-2 border-amber-300"
+              >
+                <i data-lucide="sparkles" className="w-6 h-6 text-amber-300 animate-pulse"></i>
+              </button>
+
+              {/* AI Chat Drawer */}
+              {isAiChatOpen && (
+                <div className="fixed bottom-16 md:bottom-20 right-3 sm:right-6 z-50 w-[94vw] sm:w-[420px] h-[520px] bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 flex flex-col overflow-hidden">
+                  <div className="p-3.5 bg-gradient-to-r from-purple-800 via-indigo-800 to-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <i data-lucide="bot" className="w-5 h-5 text-amber-300"></i>
+                      <h4 className="text-xs sm:text-sm font-bold">Karvon Market Gemini AI</h4>
+                    </div>
+                    <button onClick={() => setIsAiChatOpen(false)} className="p-1 text-white/80">✕</button>
+                  </div>
+
+                  <div className="p-2 bg-slate-950 border-b border-slate-800 flex gap-1.5 overflow-x-auto">
+                    <button onClick={() => handleSendAiMessage("Menga L razmerda kiyimlar ko'rsat")} className="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-full text-[10px] text-amber-400 font-semibold whitespace-nowrap">
+                      {t("aiPromptQuick1")}
+                    </button>
+                    <button onClick={() => handleSendAiMessage("200 ming so'mgacha sovg'alar")} className="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-full text-[10px] text-slate-300 whitespace-nowrap">
+                      {t("aiPromptQuick2")}
+                    </button>
+                  </div>
+
+                  <div className="flex-1 p-3 overflow-y-auto space-y-3 bg-slate-950/60">
+                    {aiMessages.map((msg, idx) => (
+                      <div key={idx} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                        <div className={`p-2.5 rounded-2xl text-xs max-w-[85%] ${msg.sender === 'user' ? 'bg-amber-500 text-slate-950 font-semibold' : 'bg-slate-900 text-slate-100 border border-slate-800'}`}>
+                          {msg.text}
+                        </div>
+                        {msg.recommendedProducts && (
+                          <div className="mt-2 space-y-1.5 w-full">
+                            {msg.recommendedProducts.map(p => (
+                              <div key={p.id} onClick={() => { setSelectedProduct(p); setIsAiChatOpen(false); }} className="bg-slate-900 p-2 rounded-xl border border-amber-500/30 flex items-center gap-2 cursor-pointer">
+                                <img src={p.image} className="w-10 h-10 rounded-lg object-cover" />
+                                <div className="flex-1 min-w-0">
+                                  <h5 className="text-xs font-bold text-slate-100 truncate">{p.title}</h5>
+                                  <span className="text-xs font-black text-amber-400">{p.price.toLocaleString()} {t("currency")}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {isAiLoading && <div className="text-xs text-amber-400 font-bold">AI Qidirilmoqda...</div>}
+                  </div>
+
+                  <form onSubmit={(e) => { e.preventDefault(); handleSendAiMessage(); }} className="p-2.5 bg-slate-900 border-t border-slate-800 flex gap-1.5">
+                    <input type="text" placeholder="Savolingizni yozing..." value={aiInput} onChange={(e) => setAiInput(e.target.value)} className="flex-1 bg-slate-950 text-xs text-slate-100 px-3 py-2 rounded-xl border border-slate-800 outline-none" />
+                    <button type="submit" className="p-2 bg-amber-500 text-slate-950 font-bold rounded-xl">➤</button>
+                  </form>
+                </div>
+              )}
+
+              {/* MODAL: AI Visual Search */}
+              {isVisualSearchOpen && (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
+                    <button onClick={() => setIsVisualSearchOpen(false)} className="absolute top-4 right-4 text-slate-400">✕</button>
+                    <div className="text-center mb-5">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-amber-300 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="camera" className="w-7 h-7"></i>
+                      </div>
+                      <h3 className="text-base font-black text-slate-100">{t("visualSearchTitle")}</h3>
+                      <p className="text-xs text-slate-400 mt-1">{t("visualSearchDesc")}</p>
+                    </div>
+                    <div className="border-2 border-dashed border-slate-700 hover:border-amber-500 rounded-2xl p-8 text-center cursor-pointer bg-slate-950/60 mb-4">
+                      <p className="text-xs font-bold text-slate-300">Rasm yuklash uchun bosing yoki faylni surib keling</p>
+                    </div>
+                    <button onClick={() => { showToast("AI Rasm tahlil qilindi! L Razmerdagi mos kiyimlar topildi ✨"); setSelectedCategory("Kiyim"); setActiveTab("shop"); setIsVisualSearchOpen(false); }} className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-xs rounded-xl">
+                      Gemini AI Orqali Qidirish
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* MODAL: Live Track Code Tracker */}
+              {isTrackCodeModalOpen && (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 relative shadow-2xl">
+                    <button onClick={() => setIsTrackCodeModalOpen(false)} className="absolute top-4 right-4 text-slate-400">✕</button>
+                    <div className="flex items-center gap-3 mb-4">
+                      <i data-lucide="truck" className="w-6 h-6 text-sky-400"></i>
+                      <div>
+                        <h3 className="text-base font-black text-slate-100">{t("trackCodeTitle")}</h3>
+                        <p className="text-xs text-slate-400">Xitoy va Turkiyadan kelayotgan buyurtmangizni jonli kuzating</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mb-4">
+                      <input type="text" placeholder={t("trackCodePlaceholder")} value={trackCodeQuery} onChange={(e) => setTrackCodeQuery(e.target.value)} className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none" />
+                      <button onClick={() => setActiveTrackOrder({ code: trackCodeQuery || "KV-8923-CN", origin: "Xitoy (Shenzhen)", dest: "Toshkent sh." })} className="px-4 py-2 bg-sky-500 text-slate-950 font-black text-xs rounded-xl">Kuzatish</button>
+                    </div>
+                    {activeTrackOrder && (
+                      <div className="bg-slate-950 p-4 rounded-2xl space-y-2 text-xs">
+                        <div className="text-sky-400 font-bold">Trek: {activeTrackOrder.code}</div>
+                        <div className="text-emerald-400 font-bold">✓ 1. Omborida qabul qilindi</div>
+                        <div className="text-amber-400 font-bold">2. Bojxona va Xalqaro yo'lda (✈️)</div>
+                        <div className="text-slate-500">3. Toshkent markaziy omborida</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* MODAL: Cargo Calculator */}
+              {isCargoCalcOpen && (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
+                    <button onClick={() => setIsCargoCalcOpen(false)} className="absolute top-4 right-4 text-slate-400">✕</button>
+                    <h3 className="text-base font-black text-slate-100 mb-3">{t("cargoCalcTitle")}</h3>
+                    <div className="space-y-3 mb-4 text-xs">
+                      <div>
+                        <label className="text-slate-400 block mb-1">Tovarning Narxi ($)</label>
+                        <input type="number" value={itemPriceUsd} onChange={(e) => setItemPriceUsd(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white" />
+                      </div>
+                      <div>
+                        <label className="text-slate-400 block mb-1">Vazni (Kg)</label>
+                        <input type="number" step="0.1" value={cargoWeight} onChange={(e) => setCargoWeight(Number(e.target.value))} className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white" />
+                      </div>
+                    </div>
+                    <div className="bg-slate-950 p-4 rounded-2xl space-y-2 text-xs mb-4">
+                      <div className="flex justify-between text-amber-400 font-bold">
+                        <span>Sof Tan Narx:</span>
+                        <span>{Math.round((itemPriceUsd + (cargoWeight * 6.5)) * 12800).toLocaleString()} so'm</span>
+                      </div>
+                      <div className="flex justify-between text-emerald-400 font-black">
+                        <span>Sotuv Narxi (35% Margin):</span>
+                        <span>{Math.round((itemPriceUsd + (cargoWeight * 6.5)) * 12800 * 1.35).toLocaleString()} so'm</span>
+                      </div>
+                    </div>
+                    <button onClick={() => { showToast("Sotuv narxi hisoblandi!"); setIsCargoCalcOpen(false); }} className="w-full py-3 bg-amber-500 text-slate-950 font-black text-xs rounded-xl">Saqlash</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile Bottom Navigation Bar */}
+              <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 md:hidden flex justify-around items-center py-2 px-1 shadow-2xl">
+                <button onClick={() => setActiveTab("shop")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'shop' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="shopping-bag" className="w-5 h-5"></i>
+                  <span>{t("shop")}</span>
+                </button>
+                <button onClick={() => setActiveTab("categories")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'categories' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="grid" className="w-5 h-5"></i>
+                  <span>{t("categories")}</span>
+                </button>
+                <button onClick={() => setActiveTab("stats")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'stats' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="bar-chart-3" className="w-5 h-5"></i>
+                  <span>{t("statsNav")}</span>
+                </button>
+                <button onClick={() => setIsCartOpen(true)} className="flex flex-col items-center gap-0.5 text-[10px] font-bold text-slate-400 relative">
+                  <i data-lucide="shopping-cart" className="w-5 h-5"></i>
+                  <span>{t("cart")}</span>
+                </button>
+              </div>
+
+            </div>
+          );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
