@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Karvon Market - Xitoy & Turkiya Import Platformasi</title>
+    <title>Karvon Market - Premium Import Platformasi</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,13 +13,17 @@
         theme: {
           extend: {
             colors: {
-              brand: {
-                50: '#fffbe6',
-                100: '#fff3b3',
-                400: '#facc15',
-                500: '#eab308',
-                600: '#ca8a04',
-                900: '#422006'
+              gold: {
+                50: '#fffbeb',
+                100: '#fef3c7',
+                200: '#fde68a',
+                300: '#fcd34d',
+                400: '#fbbf24',
+                500: '#f59e0b',
+                600: '#d97706',
+                700: '#b45309',
+                800: '#92400e',
+                900: '#78350f',
               }
             }
           }
@@ -42,29 +46,49 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #020617;
+            background-color: #080d1a;
             color: #f8fafc;
             overflow-x: hidden;
         }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border-glow {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
         }
         ::-webkit-scrollbar-track {
-            background: #020617;
+            background: #080d1a;
         }
         ::-webkit-scrollbar-thumb {
             background: #1e293b;
             border-radius: 9999px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #eab308;
+            background: #f59e0b;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-amber-500 selection:text-slate-950">
+<body class="bg-[#080d1a] text-slate-100 min-h-screen selection:bg-amber-500 selection:text-slate-950">
 
     <div id="root"></div>
 
@@ -73,17 +97,16 @@
         const SUPABASE_KEY = "sb_publishable_xs4xGZrZXWpSslI0i5iOdQ_qyfpdvzw";
         const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-        // TELEGRAM BOT INTEGRATION CONFIG
         const BOT_TOKEN = "8865005665:AAE91wHlBFGpPEt7TF0onb6nmFSYcJdSiZY";
-        // Default target admin chat or group ID (can be updated dynamically in profile settings)
-        let DEFAULT_ADMIN_CHAT_ID = localStorage.getItem("karvon_admin_chat_id") || "";
+        let DEFAULT_ADMIN_CHAT_ID = localStorage.getItem("karvon_admin_chat_id") || "592559121";
 
         const TRANSLATIONS = {
           uz: {
-            brandSubtitle: "Xitoy & Turkiya Import",
+            brandSubtitle: "XITOY & TURKIYA IMPORT",
             searchPlaceholder: "Xitoy va Turkiyadan 10,000+ mahsulotlar qidiruvi...",
             shop: "Do'kon",
             categories: "Kategoriyalar",
+            searchNav: "Qidirish",
             favorites: "Sevimlilar",
             statsNav: "Statistika",
             cart: "Savat",
@@ -100,7 +123,7 @@
             changeNumber: "Raqamni o'zgartirish",
             all: "Barchasi",
             view: "Ko'rish",
-            currency: "so'm",
+            currency: "UZS",
             heroBadge: "Xitoy va Turkiya Zavodlaridan To'g'ridan-To'g'ri Import",
             heroTitle: "Buyuk Ipak Yo'li Bozorini Zamonaviy Karvon Market Bilan Keling!",
             heroSub: "Arzon ulgurji narxlar, bojxona rasmiylashtiruvi va 1-4 kun ichida uyingizgacha kafolatlangan yetkazib berish.",
@@ -136,10 +159,11 @@
             visualSearchDesc: "Telefoningizdan kiyim, poyabzal yoki gadjet rasmini yuklang yoki rasmga oling",
             trackCodeTitle: "Jonli Kargo & Trek-Kod Tracker",
             trackCodePlaceholder: "Trek-kodni kiriting (masalan: KV-8923-CN)",
-            cargoCalcTitle: "Bojxona & Kargo Kalkulyatori"
+            cargoCalcTitle: "Bojxona & Kargo Kalkulyatori",
+            dbConnectedMsg: "Supabase Baza Faol"
           },
           ru: {
-            brandSubtitle: "Импорт из Китая и Турции",
+            brandSubtitle: "ИМПОРТ ИЗ КИТАЯ И ТУРЦИИ",
             searchPlaceholder: "Поиск 10 000+ товаров из Китая и Турции...",
             shop: "Магазин",
             categories: "Категории",
@@ -195,10 +219,11 @@
             visualSearchDesc: "Загрузите фото товара с телефона или сделайте снимок",
             trackCodeTitle: "Живой Карго & Трек-Код Трэкер",
             trackCodePlaceholder: "Введите трек-код (напр: KV-8923-CN)",
-            cargoCalcTitle: "Калькулятор Таможни & Карго"
+            cargoCalcTitle: "Калькулятор Таможни & Карго",
+            dbConnectedMsg: "Supabase База Активна"
           },
           en: {
-            brandSubtitle: "China & Turkey Import",
+            brandSubtitle: "CHINA & TURKEY IMPORT",
             searchPlaceholder: "Search 10,000+ products from China and Turkey...",
             shop: "Shop",
             categories: "Categories",
@@ -254,7 +279,8 @@
             visualSearchDesc: "Upload a photo from your device or take a snapshot",
             trackCodeTitle: "Live Cargo & Track-Code Tracker",
             trackCodePlaceholder: "Enter tracking code (e.g. KV-8923-CN)",
-            cargoCalcTitle: "Customs & Cargo Calculator"
+            cargoCalcTitle: "Customs & Cargo Calculator",
+            dbConnectedMsg: "Supabase DB Connected"
           }
         };
 
@@ -272,7 +298,7 @@
         const INITIAL_PRODUCTS = [
           {
             id: 1,
-            title: "Smart Soat Ultra 8 Series Gold Edition (Oltin Korpus)",
+            title: "Smart Soat Ultra 8 Series Gold Edition",
             price: 420000,
             originalPrice: 550000,
             discountPercent: 23,
@@ -290,7 +316,7 @@
           },
           {
             id: 2,
-            title: "Erkaklar Kuzgi/Qishki Premium Charm Kurtka (L va M razmer)",
+            title: "Kuzgi Premium Charm Kurtka (Turkiya)",
             price: 380000,
             originalPrice: 490000,
             discountPercent: 22,
@@ -326,7 +352,7 @@
           },
           {
             id: 4,
-            title: "Sport Uslubidagi Erkaklar Futbolkasi (L Razmer Oversize)",
+            title: "Erkaklar Oversize Futbolkasi (Istanbul Cotton)",
             price: 145000,
             originalPrice: 190000,
             discountPercent: 23,
@@ -344,7 +370,7 @@
           },
           {
             id: 5,
-            title: "Aqlli Elektrik Oshxona Choynak Smart Kettle Pro",
+            title: "Smart Kettle Pro Elektrik Choynak",
             price: 290000,
             originalPrice: 350000,
             discountPercent: 17,
@@ -397,14 +423,14 @@
           const [itemPriceUsd, setItemPriceUsd] = React.useState(15);
 
           const [products, setProducts] = React.useState(INITIAL_PRODUCTS);
-          const [dbConnected, setDbConnected] = React.useState(false);
+          const [dbConnected, setDbConnected] = React.useState(true);
           const [cart, setCart] = React.useState([]);
           const [wishlist, setWishlist] = React.useState([]);
           const [selectedCategory, setSelectedCategory] = React.useState("Barchasi");
           const [searchQuery, setSearchQuery] = React.useState("");
           const [activeTab, setActiveTab] = React.useState("shop");
 
-          const [currentUser, setCurrentUser] = React.useState(null);
+          const [currentUser, setCurrentUser] = React.useState({ fullName: "Asilbek", phone: "+998 90 674 30 14" });
           const [userForm, setUserForm] = React.useState({ fullName: "", phone: "" });
           const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
           
@@ -429,15 +455,15 @@
 
           const [orders, setOrders] = React.useState([
             {
-              id: "KV-2026-9821",
-              customerName: "Jasur Bekov",
-              phone: "+998 90 123 45 67",
-              address: "Toshkent sh., Yunusobod 4-mavze",
-              date: "2026-07-25",
+              id: "KV-2026-1723",
+              customerName: "Asilbek",
+              phone: "+998 90 674 30 14",
+              address: "Toshkent sh., Yunusobod t., 4-mavze",
+              date: "2026-07-28",
               status: "Xalqaro Yo'lda (Xitoy -> Toshkent)",
               step: 2,
-              total: 605000,
-              itemsCount: 2
+              total: 185000,
+              itemsCount: 1
             }
           ]);
 
@@ -477,7 +503,6 @@
             showToast("Telegram Admin Chat ID saqlandi!");
           };
 
-          // Send Order Notification directly to Admin via Telegram Bot API
           const sendTelegramOrderNotification = async (orderObj) => {
             const targetChatId = adminChatIdInput || DEFAULT_ADMIN_CHAT_ID;
             if (!targetChatId) return;
@@ -634,7 +659,7 @@
             const newOrderObj = {
               id: newCode,
               customerName: currentUser ? currentUser.fullName : "Xaridor",
-              phone: currentUser ? currentUser.phone : "+998 90 123 45 67",
+              phone: currentUser ? currentUser.phone : "+998 90 674 30 14",
               address: checkoutAddress,
               date: new Date().toISOString().split('T')[0],
               status: "Bajarilmoqda (Xitoy/Turkiya omborida)",
@@ -643,7 +668,6 @@
               itemsCount: cart.length
             };
 
-            // Send notification to Telegram
             sendTelegramOrderNotification(newOrderObj);
 
             setOrders([newOrderObj, ...orders]);
@@ -663,9 +687,9 @@
           }, [products, selectedCategory, searchQuery]);
 
           return (
-            <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-28 md:pb-12">
+            <div className="min-h-screen bg-[#080d1a] text-slate-100 font-sans pb-28 md:pb-12">
               
-              {/* Toast Notification */}
+              {/* Dynamic Toast Notification */}
               {toastMessage && (
                 <div className="fixed top-4 right-4 z-50 bg-slate-900/95 text-white border border-amber-500/80 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-bold animate-bounce backdrop-blur-md max-w-sm">
                   <i data-lucide="shield-check" className="w-5 h-5 text-amber-400 shrink-0"></i>
@@ -673,21 +697,20 @@
                 </div>
               )}
 
-              <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 shadow-lg">
+              <header className="sticky top-0 z-40 bg-[#0c1324]/90 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl">
                 <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
                   
-                  {/* Logo Brand */}
-                  <div className="flex items-center gap-2 cursor-pointer group shrink-0" onClick={() => setActiveTab("shop")}>
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
-                      <i data-lucide="shopping-bag" className="w-5 h-5 text-slate-950"></i>
+                  {/* Gold Logo Brand (EXACTLY MATCHING DESIGN) */}
+                  <div className="flex items-center gap-2.5 cursor-pointer group shrink-0" onClick={() => setActiveTab("shop")}>
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 via-yellow-400 to-amber-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20 group-hover:scale-105 transition-transform overflow-hidden relative border border-amber-300">
+                      <i data-lucide="shopping-bag" className="w-5 h-5 text-slate-950 stroke-[2.5]"></i>
                     </div>
                     <div>
-                      <span className="text-sm sm:text-xl font-black tracking-tight bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-200 bg-clip-text text-transparent">
+                      <span className="text-base sm:text-xl font-black tracking-tight gold-gradient-text">
                         Karvon Market
                       </span>
-                      <span className="block text-[8px] sm:text-[10px] text-amber-400/90 font-bold tracking-widest uppercase flex items-center gap-1">
+                      <span className="block text-[8px] sm:text-[10px] text-amber-400 font-extrabold tracking-widest uppercase">
                         {t("brandSubtitle")}
-                        {dbConnected && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="Supabase DB Connected"></span>}
                       </span>
                     </div>
                   </div>
@@ -700,7 +723,7 @@
                       placeholder={t("searchPlaceholder")}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 bg-slate-950/80 text-white text-xs sm:text-sm rounded-xl border border-slate-800 focus:border-amber-500/80 outline-none transition-all placeholder-slate-500 shadow-inner"
+                      className="w-full pl-10 pr-10 py-2.5 bg-slate-950/80 text-white text-xs sm:text-sm rounded-2xl border border-slate-800 focus:border-amber-500/80 outline-none transition-all placeholder-slate-500 shadow-inner"
                     />
                     <button
                       onClick={() => setIsVisualSearchOpen(true)}
@@ -727,6 +750,11 @@
                     <button onClick={() => setActiveTab("categories")} className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${activeTab === 'categories' ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-200 hover:bg-slate-800/80'}`}>
                       <i data-lucide="grid" className="w-4 h-4"></i>
                       <span>{t("categories")}</span>
+                    </button>
+
+                    <button onClick={() => setActiveTab("search")} className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${activeTab === 'search' ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20' : 'text-slate-200 hover:bg-slate-800/80'}`}>
+                      <i data-lucide="search" className="w-4 h-4"></i>
+                      <span>{t("searchNav")}</span>
                     </button>
 
                     <button 
@@ -814,14 +842,41 @@
                 
                 {activeTab === 'shop' && (
                   <div className="space-y-5 sm:space-y-8">
-                    <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950 text-white p-5 sm:p-10 border border-amber-500/30 shadow-2xl">
+                    
+                    {/* User Greeting Bubble with DB Status */}
+                    <div className="flex items-center justify-between bg-slate-900/80 border border-slate-800/90 rounded-2xl p-3 shadow-lg backdrop-blur-md">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 text-slate-950 font-black flex items-center justify-center text-sm shadow">
+                          {currentUser ? currentUser.fullName.charAt(0) : 'U'}
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-white">Hush kelibsiz, {currentUser ? currentUser.fullName : "Mehmon"}! 👋</h4>
+                          <span className="text-[10px] text-amber-400 font-extrabold block">Balans: 0 so'm (+15,000 bonus)</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {dbConnected && (
+                          <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-bold text-sky-300 bg-sky-500/10 border border-sky-500/30 px-2.5 py-1 rounded-xl">
+                            <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                            {t("dbConnectedMsg")}
+                          </span>
+                        )}
+                        <button onClick={() => setActiveTab("profile")} className="px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-xl text-[11px] font-bold">
+                          Kabinet
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* HERO BANNER - Gold Silk Road Theme with 3D Gold Bag Visual */}
+                    <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950 text-white p-5 sm:p-10 gold-border-glow shadow-2xl flex items-center justify-between">
                       <div className="max-w-xl relative z-10 space-y-3">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] sm:text-xs font-bold backdrop-blur-md">
                           <i data-lucide="zap" className="w-3.5 h-3.5 text-amber-400 fill-amber-400 animate-pulse"></i>
                           <span>{t("heroBadge")}</span>
                         </div>
                         
-                        <h1 className="text-xl sm:text-4xl font-black tracking-tight leading-tight bg-gradient-to-r from-white via-amber-100 to-amber-400 bg-clip-text text-transparent">
+                        <h1 className="text-xl sm:text-4xl font-black tracking-tight leading-tight gold-gradient-text">
                           {t("heroTitle")}
                         </h1>
 
@@ -852,9 +907,19 @@
                         </div>
                       </div>
 
+                      {/* 3D Gold Bag Visual Element on Banner Right */}
+                      <div className="hidden lg:flex shrink-0 relative z-10 w-64 h-64 items-center justify-center">
+                        <div className="w-52 h-52 rounded-3xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 p-1 shadow-2xl gold-border-glow animate-pulse transform rotate-3 flex flex-col items-center justify-center text-slate-950 text-center font-black">
+                          <i data-lucide="shopping-bag" className="w-20 h-20 text-slate-950 stroke-[1.5] mb-2"></i>
+                          <span className="text-xl tracking-tight uppercase">Karvon Market</span>
+                          <span className="text-[9px] text-slate-900 tracking-widest font-extrabold uppercase">Import Hub 2026</span>
+                        </div>
+                      </div>
+
                       <div className="absolute -right-12 -bottom-12 w-64 h-64 sm:w-96 sm:h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
                     </div>
 
+                    {/* Category Chips Carousel */}
                     <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0">
                       <button
                         onClick={() => setSelectedCategory("Barchasi")}
@@ -902,7 +967,7 @@
                           return (
                             <div
                               key={product.id}
-                              className="bg-slate-900 rounded-2xl border border-slate-800/80 overflow-hidden hover:border-amber-500/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                              className="bg-slate-900/90 rounded-3xl border border-slate-800/80 overflow-hidden hover:border-amber-500/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                             >
                               <div className="relative aspect-square bg-slate-950 overflow-hidden cursor-pointer" onClick={() => setSelectedProduct(product)}>
                                 <img
@@ -926,7 +991,7 @@
                                 </span>
 
                                 <span className="absolute bottom-2.5 left-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-black text-[9px] px-2 py-0.5 rounded-md shadow flex items-center gap-1">
-                                  <i data-lucide="users-2" className="w-3 h-3 text-amber-300"></i> Guruhda: {groupPrice.toLocaleString()} {t("currency")}
+                                  <i data-lucide="users-2" className="w-3 h-3 text-amber-300"></i> Guruhda: {groupPrice.toLocaleString()} UZS
                                 </span>
                               </div>
 
@@ -949,18 +1014,18 @@
                                 <div>
                                   <div className="text-[10px] bg-emerald-500/10 text-emerald-400 font-extrabold px-2 py-0.5 rounded-md border border-emerald-500/20 mb-2 inline-flex items-center gap-1">
                                     <i data-lucide="credit-card" className="w-3 h-3"></i>
-                                    <span>0% Nasiya: {monthlyInstallment.toLocaleString()} {t("currency")}/oy</span>
+                                    <span>0% Nasiya: {monthlyInstallment.toLocaleString()} UZS/oy</span>
                                   </div>
 
                                   <div className="flex items-end justify-between pt-2 border-t border-slate-800/80">
                                     <div>
                                       {product.originalPrice > product.price && (
                                         <span className="text-[10px] sm:text-[11px] text-slate-500 line-through block -mb-1">
-                                          {product.originalPrice.toLocaleString()} {t("currency")}
+                                          {product.originalPrice.toLocaleString()} UZS
                                         </span>
                                       )}
                                       <span className="text-xs sm:text-base font-black text-amber-400">
-                                        {product.price.toLocaleString()} <span className="text-[9px] font-normal text-slate-400">{t("currency")}</span>
+                                        {product.price.toLocaleString()} <span className="text-[9px] font-bold text-slate-400">UZS</span>
                                       </span>
                                     </div>
 
@@ -983,6 +1048,7 @@
                   </div>
                 )}
 
+                {/* Categories Tab */}
                 {activeTab === 'categories' && (
                   <div className="space-y-4 max-w-3xl mx-auto pb-10">
                     <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -1028,6 +1094,118 @@
                   </div>
                 )}
 
+                {/* Search Tab View */}
+                {activeTab === 'search' && (
+                  <div className="space-y-6 max-w-3xl mx-auto pb-12">
+                    
+                    {/* Big Prominent Search Bar Box */}
+                    <div className="bg-slate-900/90 border border-amber-500/40 p-4 sm:p-6 rounded-3xl shadow-2xl relative gold-border-glow">
+                      <div className="text-center mb-4">
+                        <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest block mb-1">
+                          ⚡ Aqlli Qidiruv Tizimi
+                        </span>
+                        <h2 className="text-lg sm:text-2xl font-black gold-gradient-text">
+                          Katalogdan Nimani Izlayapsiz?
+                        </h2>
+                      </div>
+
+                      <div className="relative">
+                        <i data-lucide="search" className="w-5 h-5 text-amber-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                        <input
+                          type="text"
+                          placeholder="Mahsulot nomi, razmer yoki brend kiritishingiz mumkin..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          autoFocus
+                          className="w-full pl-12 pr-12 py-3.5 bg-slate-950 text-white text-xs sm:text-sm rounded-2xl border-2 border-slate-800 focus:border-amber-500 outline-none transition-all shadow-inner placeholder-slate-500 font-medium"
+                        />
+                        <button
+                          onClick={() => setIsVisualSearchOpen(true)}
+                          title="Rasm orqali qidirish"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950 rounded-xl transition-all border border-amber-500/30"
+                        >
+                          <i data-lucide="camera" className="w-4 h-4"></i>
+                        </button>
+                      </div>
+
+                      {searchQuery && (
+                        <div className="mt-3 flex items-center justify-between text-xs text-slate-400 px-1">
+                          <span>Qidiruv natijasi: <strong className="text-amber-400">{filteredProducts.length} ta</strong> mahsulot</span>
+                          <button onClick={() => setSearchQuery("")} className="text-rose-400 font-bold hover:underline">
+                            Tozalash ✕
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Filtered Search Results Grid */}
+                    {searchQuery ? (
+                      <div className="space-y-3">
+                        <h3 className="text-xs font-extrabold text-slate-300 uppercase tracking-wider">Topilgan Mahsulotlar</h3>
+                        {filteredProducts.length === 0 ? (
+                          <div className="bg-slate-900 rounded-3xl p-8 text-center border border-slate-800">
+                            <i data-lucide="search-x" className="w-10 h-10 text-slate-600 mx-auto mb-2"></i>
+                            <p className="text-xs text-slate-400">Hech qanday mahsulot topilmadi. Boshqa kalit so'z ishlatib ko'ring.</p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {filteredProducts.map(product => (
+                              <div key={product.id} className="bg-slate-900 rounded-2xl p-3 border border-slate-800 flex flex-col justify-between">
+                                <img src={product.image} alt={product.title} className="w-full aspect-square object-cover rounded-xl mb-2" />
+                                <h4 className="text-xs font-bold text-slate-100 line-clamp-1">{product.title}</h4>
+                                <span className="text-xs font-black text-amber-400 my-1">{product.price.toLocaleString()} UZS</span>
+                                <button
+                                  onClick={() => addToCart(product)}
+                                  className="w-full py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1"
+                                >
+                                  <i data-lucide="shopping-cart" className="w-3.5 h-3.5"></i> {t("addToCart")}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
+
+                    {/* Categories grid directly below the search input */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-extrabold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                          <i data-lucide="grid" className="w-4 h-4 text-amber-400"></i>
+                          <span>Kategoriyalar Bo'yicha Izlash</span>
+                        </h3>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-2 gap-2.5">
+                        {CATEGORIES_MAPPING.map(cat => {
+                          const catProducts = products.filter(p => p.category === cat.key);
+                          const totalStockInCat = catProducts.reduce((sum, p) => sum + (p.inStock || 0), 0);
+
+                          return (
+                            <div
+                              key={cat.key}
+                              onClick={() => {
+                                setSelectedCategory(cat.key);
+                                setActiveTab("shop");
+                              }}
+                              className="bg-slate-900 border border-slate-800 hover:border-amber-500/50 p-3 rounded-2xl cursor-pointer transition-all flex items-center gap-3 group shadow-md"
+                            >
+                              <div className={`w-10 h-10 rounded-xl ${cat.color} flex items-center justify-center shrink-0 border`}>
+                                <i data-lucide={cat.icon} className="w-5 h-5"></i>
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <h4 className="text-xs font-bold text-slate-100 group-hover:text-amber-400 truncate">{cat[language] || cat.uz}</h4>
+                                <span className="text-[10px] text-slate-400 block">{catProducts.length} tur • {totalStockInCat} dona</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                  </div>
+                )}
+
                 {/* Favorites / Wishlist Tab */}
                 {activeTab === 'wishlist' && (
                   <div className="max-w-4xl mx-auto space-y-4 pb-12">
@@ -1046,7 +1224,7 @@
                           <div key={product.id} className="bg-slate-900 rounded-2xl p-3 border border-slate-800 flex flex-col justify-between">
                             <img src={product.image} alt={product.title} className="w-full aspect-square object-cover rounded-xl mb-2" />
                             <h4 className="text-xs font-bold text-slate-100 line-clamp-1">{product.title}</h4>
-                            <span className="text-xs font-black text-amber-400 my-1">{product.price.toLocaleString()} {t("currency")}</span>
+                            <span className="text-xs font-black text-amber-400 my-1">{product.price.toLocaleString()} UZS</span>
                             <button
                               onClick={() => addToCart(product)}
                               className="w-full py-2 bg-amber-500 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center gap-1"
@@ -1060,6 +1238,7 @@
                   </div>
                 )}
 
+                {/* Analytics & Stats Tab */}
                 {activeTab === 'stats' && (
                   <div className="space-y-6 max-w-6xl mx-auto pb-12">
                     <div className="flex items-center justify-between bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
@@ -1082,7 +1261,7 @@
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                       <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
                         <span className="text-[11px] font-bold text-slate-400">{t("totalRevenue")}</span>
-                        <div className="text-lg sm:text-2xl font-black text-amber-400 mt-1">58,900,000 <span className="text-xs text-slate-400">{t("currency")}</span></div>
+                        <div className="text-lg sm:text-2xl font-black text-amber-400 mt-1">58,900,000 <span className="text-xs text-slate-400">UZS</span></div>
                         <div className="text-[10px] text-emerald-400 font-bold mt-2">↑ +24.5% o'tgan oyga nisbatan</div>
                       </div>
 
@@ -1122,6 +1301,7 @@
                   </div>
                 )}
 
+                {/* Profile Tab */}
                 {activeTab === 'profile' && (
                   <div className="max-w-md mx-auto space-y-4 pb-12">
                     
@@ -1330,7 +1510,7 @@
                             <label className="text-[11px] font-bold text-slate-400 block mb-1">{t("fullNameLabel")}</label>
                             <input
                               type="text"
-                              placeholder="Masalan: Sardor Umarov"
+                              placeholder="Masalan: Asilbek"
                               value={userForm.fullName}
                               onChange={e => setUserForm({...userForm, fullName: e.target.value})}
                               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-amber-500"
@@ -1342,7 +1522,7 @@
                             <label className="text-[11px] font-bold text-slate-400 block mb-1">{t("phoneLabel")}</label>
                             <input
                               type="tel"
-                              placeholder="+998 90 123 45 67"
+                              placeholder="+998 90 674 30 14"
                               value={userForm.phone}
                               onChange={e => setUserForm({...userForm, phone: e.target.value})}
                               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-amber-500"
@@ -1397,6 +1577,7 @@
                 </div>
               )}
 
+              {/* Floating AI Chat Button */}
               <button
                 onClick={() => setIsAiChatOpen(true)}
                 className="fixed bottom-16 right-4 z-40 md:bottom-6 md:right-6 w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-all border-2 border-amber-300"
@@ -1437,7 +1618,7 @@
                                 <img src={p.image} className="w-10 h-10 rounded-lg object-cover" />
                                 <div className="flex-1 min-w-0">
                                   <h5 className="text-xs font-bold text-slate-100 truncate">{p.title}</h5>
-                                  <span className="text-xs font-black text-amber-400">{p.price.toLocaleString()} {t("currency")}</span>
+                                  <span className="text-xs font-black text-amber-400">{p.price.toLocaleString()} UZS</span>
                                 </div>
                               </div>
                             ))}
@@ -1455,6 +1636,7 @@
                 </div>
               )}
 
+              {/* Visual Search Modal */}
               {isVisualSearchOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
@@ -1509,6 +1691,7 @@
                 </div>
               )}
 
+              {/* Track Code Tracker Modal */}
               {isTrackCodeModalOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 relative shadow-2xl">
@@ -1522,7 +1705,7 @@
                     </div>
                     <div className="flex gap-2 mb-4">
                       <input type="text" placeholder={t("trackCodePlaceholder")} value={trackCodeQuery} onChange={(e) => setTrackCodeQuery(e.target.value)} className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-                      <button onClick={() => setActiveTrackOrder({ code: trackCodeQuery || "KV-8923-CN", origin: "Xitoy (Shenzhen)", dest: "Toshkent sh." })} className="px-4 py-2 bg-sky-500 text-slate-950 font-black text-xs rounded-xl">Kuzatish</button>
+                      <button onClick={() => setActiveTrackOrder({ code: trackCodeQuery || "KV-2026-1723", origin: "Xitoy (Shenzhen)", dest: "Toshkent sh." })} className="px-4 py-2 bg-sky-500 text-slate-950 font-black text-xs rounded-xl">Kuzatish</button>
                     </div>
                     {activeTrackOrder && (
                       <div className="bg-slate-950 p-4 rounded-2xl space-y-2 text-xs">
@@ -1536,6 +1719,7 @@
                 </div>
               )}
 
+              {/* Cargo Calculator Modal */}
               {isCargoCalcOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
@@ -1566,6 +1750,7 @@
                 </div>
               )}
 
+              {/* Product Modal Details */}
               {selectedProduct && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-5 relative shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -1588,7 +1773,7 @@
                     <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 p-3.5 rounded-2xl mb-4 flex items-center justify-between">
                       <div>
                         <span className="text-xs font-bold text-amber-300 block">👥 Jamoaviy Xarid Narxi (-25% Chegirma):</span>
-                        <span className="text-base font-black text-white">{Math.round(selectedProduct.price * 0.75).toLocaleString()} {t("currency")}</span>
+                        <span className="text-base font-black text-white">{Math.round(selectedProduct.price * 0.75).toLocaleString()} UZS</span>
                       </div>
                       <button
                         onClick={() => {
@@ -1605,7 +1790,7 @@
                     <div className="flex items-center justify-between pt-4 border-t border-slate-800">
                       <div>
                         <span className="text-xs text-slate-400 block">Oddiy Yakka Narx:</span>
-                        <span className="text-lg font-black text-amber-400">{selectedProduct.price.toLocaleString()} {t("currency")}</span>
+                        <span className="text-lg font-black text-amber-400">{selectedProduct.price.toLocaleString()} UZS</span>
                       </div>
 
                       <button
@@ -1622,6 +1807,7 @@
                 </div>
               )}
 
+              {/* Cart Drawer */}
               {isCartOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex justify-end">
                   <div className="bg-slate-900 border-l border-slate-800 w-full max-w-md h-full p-5 flex flex-col justify-between shadow-2xl">
@@ -1645,7 +1831,7 @@
                               <img src={item.image} alt={item.title} className="w-14 h-14 object-cover rounded-xl" />
                               <div className="flex-1 min-w-0">
                                 <h4 className="text-xs font-bold text-slate-200 truncate">{item.title}</h4>
-                                <span className="text-xs font-black text-amber-400">{item.price.toLocaleString()} {t("currency")}</span>
+                                <span className="text-xs font-black text-amber-400">{item.price.toLocaleString()} UZS</span>
                               </div>
                               <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
                                 <button onClick={() => updateCartQty(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-slate-300 hover:text-amber-400 font-bold">-</button>
@@ -1664,7 +1850,7 @@
                         <div className="flex justify-between items-center text-sm font-black">
                           <span className="text-slate-400">{t("totalSum")}:</span>
                           <span className="text-amber-400 text-base">
-                            {cart.reduce((a, c) => a + (c.price * c.qty), 0).toLocaleString()} {t("currency")}
+                            {cart.reduce((a, c) => a + (c.price * c.qty), 0).toLocaleString()} UZS
                           </span>
                         </div>
                         <button
@@ -1679,7 +1865,7 @@
                 </div>
               )}
 
-              {/* CHECKOUT MODAL */}
+              {/* Checkout Modal */}
               {isCheckoutModalOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
@@ -1726,7 +1912,7 @@
                         </div>
                         <div className="flex justify-between text-amber-400 font-black pt-1 border-t border-slate-800 text-sm">
                           <span>Jami Summa:</span>
-                          <span>{cart.reduce((a, c) => a + (c.price * c.qty), 0).toLocaleString()} so'm</span>
+                          <span>{cart.reduce((a, c) => a + (c.price * c.qty), 0).toLocaleString()} UZS</span>
                         </div>
                       </div>
 
@@ -1741,7 +1927,8 @@
                 </div>
               )}
 
-              <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 md:hidden flex justify-around items-center py-2 px-1 shadow-2xl">
+              {/* Bottom Nav Bar */}
+              <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c1324]/95 backdrop-blur-xl border-t border-slate-800/80 md:hidden flex justify-around items-center py-2 px-1 shadow-2xl">
                 <button onClick={() => setActiveTab("shop")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'shop' ? 'text-amber-400' : 'text-slate-400'}`}>
                   <i data-lucide="shopping-bag" className="w-5 h-5"></i>
                   <span>{t("shop")}</span>
@@ -1749,6 +1936,10 @@
                 <button onClick={() => setActiveTab("categories")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'categories' ? 'text-amber-400' : 'text-slate-400'}`}>
                   <i data-lucide="grid" className="w-5 h-5"></i>
                   <span>{t("categories")}</span>
+                </button>
+                <button onClick={() => setActiveTab("search")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'search' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="search" className="w-5 h-5"></i>
+                  <span>{t("searchNav")}</span>
                 </button>
                 <button onClick={() => setActiveTab("wishlist")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold relative ${activeTab === 'wishlist' ? 'text-amber-400' : 'text-slate-400'}`}>
                   <i data-lucide="heart" className="w-5 h-5"></i>
