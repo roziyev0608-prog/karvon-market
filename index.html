@@ -1929,33 +1929,42 @@
 
               {/* Bottom Nav Bar */}
               <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c1324]/95 backdrop-blur-xl border-t border-slate-800/80 md:hidden flex justify-around items-center py-2 px-1 shadow-2xl">
-                <button onClick={() => setActiveTab("shop")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'shop' ? 'text-amber-400' : 'text-slate-400'}`}>
-                  <i data-lucide="shopping-bag" className="w-5 h-5"></i>
+                <button onClick={() => setActiveTab("shop")} className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${activeTab === 'shop' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="shopping-bag" className="w-4 h-4"></i>
                   <span>{t("shop")}</span>
                 </button>
-                <button onClick={() => setActiveTab("categories")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'categories' ? 'text-amber-400' : 'text-slate-400'}`}>
-                  <i data-lucide="grid" className="w-5 h-5"></i>
+                <button onClick={() => setActiveTab("categories")} className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${activeTab === 'categories' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="grid" className="w-4 h-4"></i>
                   <span>{t("categories")}</span>
                 </button>
-                <button onClick={() => setActiveTab("search")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'search' ? 'text-amber-400' : 'text-slate-400'}`}>
-                  <i data-lucide="search" className="w-5 h-5"></i>
+                <button onClick={() => setActiveTab("search")} className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${activeTab === 'search' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="search" className="w-4 h-4"></i>
                   <span>{t("searchNav")}</span>
                 </button>
-                <button onClick={() => setActiveTab("wishlist")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold relative ${activeTab === 'wishlist' ? 'text-amber-400' : 'text-slate-400'}`}>
-                  <i data-lucide="heart" className="w-5 h-5"></i>
+                <button onClick={() => setIsCartOpen(true)} className="flex flex-col items-center gap-0.5 text-[9px] font-bold text-slate-400 relative">
+                  <i data-lucide="shopping-cart" className="w-4 h-4"></i>
+                  <span>{t("cart")}</span>
+                  {cart.length > 0 && (
+                    <span className="absolute -top-1 right-1 bg-amber-400 text-slate-950 text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                      {cart.reduce((a, c) => a + c.qty, 0)}
+                    </span>
+                  )}
+                </button>
+                <button onClick={() => setActiveTab("wishlist")} className={`flex flex-col items-center gap-0.5 text-[9px] font-bold relative ${activeTab === 'wishlist' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="heart" className="w-4 h-4"></i>
                   <span>{t("favorites")}</span>
                   {wishlist.length > 0 && (
-                    <span className="absolute -top-1 right-2 bg-rose-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">
+                    <span className="absolute -top-1 right-1 bg-rose-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">
                       {wishlist.length}
                     </span>
                   )}
                 </button>
-                <button onClick={() => setActiveTab("stats")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'stats' ? 'text-amber-400' : 'text-slate-400'}`}>
-                  <i data-lucide="bar-chart-3" className="w-5 h-5"></i>
+                <button onClick={() => setActiveTab("stats")} className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${activeTab === 'stats' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="bar-chart-3" className="w-4 h-4"></i>
                   <span>{t("statsNav")}</span>
                 </button>
-                <button onClick={() => setActiveTab("profile")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'profile' ? 'text-amber-400' : 'text-slate-400'}`}>
-                  <i data-lucide="user" className="w-5 h-5"></i>
+                <button onClick={() => setActiveTab("profile")} className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${activeTab === 'profile' ? 'text-amber-400' : 'text-slate-400'}`}>
+                  <i data-lucide="user" className="w-4 h-4"></i>
                   <span>{t("profile")}</span>
                 </button>
               </div>
