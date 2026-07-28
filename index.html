@@ -379,6 +379,11 @@
           const [trackCodeQuery, setTrackCodeQuery] = React.useState("");
           const [activeTrackOrder, setActiveTrackOrder] = React.useState(null);
 
+          // Checkout State
+          const [isCheckoutModalOpen, setIsCheckoutModalOpen] = React.useState(false);
+          const [checkoutAddress, setCheckoutAddress] = React.useState("Toshkent sh., Yunusobod t., 4-mavze");
+          const [checkoutPaymentMethod, setCheckoutPaymentMethod] = React.useState("click");
+
           // Cargo Calculator Inputs
           const [cargoWeight, setCargoWeight] = React.useState(2.5);
           const [cargoOrigin, setCargoOrigin] = React.useState("Xitoy (Shenzhen)");
@@ -415,16 +420,17 @@
           const [aiInput, setAiInput] = React.useState("");
           const [isAiLoading, setIsAiLoading] = React.useState(false);
 
-          const [orders] = React.useState([
+          const [orders, setOrders] = React.useState([
             {
-              id: "ORD-98213",
+              id: "KV-2026-9821",
               customerName: "Jasur Bekov",
               phone: "+998 90 123 45 67",
               address: "Toshkent sh., Yunusobod 4-mavze",
               date: "2026-07-25",
               status: "Xalqaro Yo'lda (Xitoy -> Toshkent)",
               step: 2,
-              total: 605000
+              total: 605000,
+              itemsCount: 2
             }
           ]);
 
@@ -477,6 +483,21 @@
               return [...prev, { ...product, qty: 1 }];
             });
             showToast("Savatga qo'shildi 🛒");
+          };
+
+          const removeFromCart = (id) => {
+            setCart(prev => prev.filter(item => item.id !== id));
+            showToast("Savatdan o'chirildi");
+          };
+
+          const updateCartQty = (id, delta) => {
+            setCart(prev => prev.map(item => {
+              if (item.id === id) {
+                const newQty = item.qty + delta;
+                return newQty > 0 ? { ...item, qty: newQty } : item;
+              }
+              return item;
+            }));
           };
 
           const handleImageUpload = (e) => {
@@ -559,6 +580,32 @@
             }
           };
 
+          const handleCompleteOrderSubmit = (e) => {
+            e.preventDefault();
+            if (cart.length === 0) return;
+
+            const newCode = `KV-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+            const cartTotal = cart.reduce((a, c) => a + (c.price * c.qty), 0);
+
+            const newOrderObj = {
+              id: newCode,
+              customerName: currentUser ? currentUser.fullName : "Xaridor",
+              phone: currentUser ? currentUser.phone : "+998 90 --- -- --",
+              address: checkoutAddress,
+              date: new Date().toISOString().split('T')[0],
+              status: "Bajarilmoqda (Xitoy/Turkiya omborida)",
+              step: 1,
+              total: cartTotal,
+              itemsCount: cart.length
+            };
+
+            setOrders([newOrderObj, ...orders]);
+            setCart([]);
+            setIsCheckoutModalOpen(false);
+            setIsCartOpen(false);
+            showToast(`🎉 Buyurtma rasmiylashtirildi! Trek-kod: ${newCode}`);
+          };
+
           const filteredProducts = React.useMemo(() => {
             return products.filter(p => {
               const matchesCategory = selectedCategory === "Barchasi" || p.category === selectedCategory;
@@ -579,7 +626,6 @@
                 </div>
               )}
 
-              {/* Main Header */}
               <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 shadow-lg">
                 <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
                   
@@ -721,7 +767,6 @@
                 
                 {activeTab === 'shop' && (
                   <div className="space-y-5 sm:space-y-8">
-                    {/* HERO BANNER */}
                     <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950 text-white p-5 sm:p-10 border border-amber-500/30 shadow-2xl">
                       <div className="max-w-xl relative z-10 space-y-3">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] sm:text-xs font-bold backdrop-blur-md">
@@ -763,7 +808,6 @@
                       <div className="absolute -right-12 -bottom-12 w-64 h-64 sm:w-96 sm:h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
                     </div>
 
-                    {/* Category Chips Carousel */}
                     <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0">
                       <button
                         onClick={() => setSelectedCategory("Barchasi")}
@@ -892,7 +936,6 @@
                   </div>
                 )}
 
-                {/* Categories Tab (WITH STOCK AND ITEM COUNT DISPLAY) */}
                 {activeTab === 'categories' && (
                   <div className="space-y-4 max-w-3xl mx-auto pb-10">
                     <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -970,7 +1013,6 @@
                   </div>
                 )}
 
-                {/* Analytics & Stats Tab */}
                 {activeTab === 'stats' && (
                   <div className="space-y-6 max-w-6xl mx-auto pb-12">
                     <div className="flex items-center justify-between bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-xl">
@@ -999,7 +1041,7 @@
 
                       <div className="bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-lg">
                         <span className="text-[11px] font-bold text-slate-400">{t("activeOrders")}</span>
-                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">20 ta</div>
+                        <div className="text-lg sm:text-2xl font-black text-slate-100 mt-1">{orders.length + 18} ta</div>
                         <div className="text-[10px] text-amber-400 font-bold mt-2">12 ta xalqaro yo'lda</div>
                       </div>
 
@@ -1033,7 +1075,6 @@
                   </div>
                 )}
 
-                {/* Profile Tab (CLEANED UP: ONLY SIMPLE LOGIN WITH NAME & PHONE) */}
                 {activeTab === 'profile' && (
                   <div className="max-w-md mx-auto space-y-4 pb-12">
                     
@@ -1094,6 +1135,25 @@
                       </button>
                     </div>
 
+                    {/* Order History Cards */}
+                    {orders.length > 0 && (
+                      <div className="space-y-2 pt-2">
+                        <h4 className="text-xs font-bold text-slate-400 px-1 uppercase tracking-wider">So'nggi Buyurtmalar</h4>
+                        <div className="space-y-2">
+                          {orders.map(ord => (
+                            <div key={ord.id} className="bg-slate-900 border border-slate-800 p-3.5 rounded-2xl text-xs space-y-1">
+                              <div className="flex justify-between font-bold">
+                                <span className="text-sky-400">Trek: {ord.id}</span>
+                                <span className="text-amber-400">{ord.total.toLocaleString()} so'm</span>
+                              </div>
+                              <div className="text-[11px] text-slate-300 font-medium">{ord.status}</div>
+                              <div className="text-[10px] text-slate-500">{ord.address} • {ord.date}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Wallet Balance Box */}
                     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between relative overflow-hidden shadow-md">
                       <div className="space-y-1 relative z-10">
@@ -1144,7 +1204,20 @@
                       </div>
                     </div>
 
-                    <div className="text-center pt-4 pb-8">
+                    {currentUser && (
+                      <button
+                        onClick={() => {
+                          setCurrentUser(null);
+                          showToast("Hisobdan chiqildi");
+                        }}
+                        className="w-full py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold text-xs rounded-2xl border border-rose-500/30 flex items-center justify-center gap-2 transition-colors"
+                      >
+                        <i data-lucide="log-out" className="w-4 h-4"></i>
+                        <span>Hisobdan chiqish</span>
+                      </button>
+                    )}
+
+                    <div className="text-center pt-2 pb-8">
                       <span className="text-[11px] text-slate-500 font-bold tracking-wider block">Versiya 2.4.0 (Supabase Live)</span>
                       <span className="text-[9px] text-slate-600 block mt-0.5">Karvon Market Engine • 2026</span>
                     </div>
@@ -1154,7 +1227,7 @@
 
               </main>
 
-              {/* AUTH MODAL (CLEAN SIMPLE: ONLY NAME AND PHONE) */}
+              {/* AUTH MODAL */}
               {isAuthModalOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-6 relative shadow-2xl">
@@ -1251,7 +1324,6 @@
                 </div>
               )}
 
-              {/* Floating AI Chat Trigger */}
               <button
                 onClick={() => setIsAiChatOpen(true)}
                 className="fixed bottom-16 right-4 z-40 md:bottom-6 md:right-6 w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-all border-2 border-amber-300"
@@ -1310,7 +1382,6 @@
                 </div>
               )}
 
-              {/* MODAL: REAL VISUAL PHOTO SEARCH MODAL */}
               {isVisualSearchOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
@@ -1365,7 +1436,6 @@
                 </div>
               )}
 
-              {/* MODAL: Live Track Code Tracker */}
               {isTrackCodeModalOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 relative shadow-2xl">
@@ -1393,7 +1463,6 @@
                 </div>
               )}
 
-              {/* MODAL: Cargo Calculator */}
               {isCargoCalcOpen && (
                 <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
                   <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
@@ -1424,7 +1493,181 @@
                 </div>
               )}
 
-              {/* Mobile Bottom Navigation Bar */}
+              {selectedProduct && (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-5 relative shadow-2xl max-h-[90vh] overflow-y-auto">
+                    <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 text-slate-400 hover:text-white">✕</button>
+
+                    <img src={selectedProduct.image} alt={selectedProduct.title} className="w-full h-64 object-cover rounded-2xl mb-4" />
+                    
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                        <i data-lucide="globe" className="w-3 h-3 inline mr-1"></i> {selectedProduct.originCountry}
+                      </span>
+                      <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                        <i data-lucide="credit-card" className="w-3 h-3 inline mr-1"></i> 0% Nasiya
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-black text-slate-100 mb-2">{selectedProduct.title}</h3>
+                    <p className="text-xs text-slate-300 leading-relaxed mb-4">{selectedProduct.description}</p>
+
+                    <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 p-3.5 rounded-2xl mb-4 flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-amber-300 block">👥 Jamoaviy Xarid Narxi (-25% Chegirma):</span>
+                        <span className="text-base font-black text-white">{Math.round(selectedProduct.price * 0.75).toLocaleString()} {t("currency")}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          showToast("Jamoaviy xarid guruhi yaratildi! Havola nusxalandi 🔗");
+                          addToCart({ ...selectedProduct, price: Math.round(selectedProduct.price * 0.75) });
+                          setSelectedProduct(null);
+                        }}
+                        className="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs rounded-xl shadow"
+                      >
+                        Guruh Tuzish 👥
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+                      <div>
+                        <span className="text-xs text-slate-400 block">Oddiy Yakka Narx:</span>
+                        <span className="text-lg font-black text-amber-400">{selectedProduct.price.toLocaleString()} {t("currency")}</span>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          addToCart(selectedProduct);
+                          setSelectedProduct(null);
+                        }}
+                        className="px-5 py-2.5 bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-md"
+                      >
+                        {t("addToCart")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isCartOpen && (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex justify-end">
+                  <div className="bg-slate-900 border-l border-slate-800 w-full max-w-md h-full p-5 flex flex-col justify-between shadow-2xl">
+                    <div>
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                        <h3 className="text-base font-black text-slate-100 flex items-center gap-2">
+                          <i data-lucide="shopping-cart" className="w-5 h-5 text-amber-400"></i> {t("cart")} ({cart.length})
+                        </h3>
+                        <button onClick={() => setIsCartOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+                      </div>
+
+                      {cart.length === 0 ? (
+                        <div className="py-16 text-center text-slate-400 text-xs">
+                          <i data-lucide="shopping-cart" className="w-12 h-12 text-slate-700 mx-auto mb-2"></i>
+                          <p>{t("emptyCart")}</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                          {cart.map(item => (
+                            <div key={item.id} className="bg-slate-950 border border-slate-800 p-3 rounded-2xl flex items-center gap-3">
+                              <img src={item.image} alt={item.title} className="w-14 h-14 object-cover rounded-xl" />
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-xs font-bold text-slate-200 truncate">{item.title}</h4>
+                                <span className="text-xs font-black text-amber-400">{item.price.toLocaleString()} {t("currency")}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                                <button onClick={() => updateCartQty(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-slate-300 hover:text-amber-400 font-bold">-</button>
+                                <span className="text-xs font-bold w-4 text-center">{item.qty}</span>
+                                <button onClick={() => updateCartQty(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-slate-300 hover:text-amber-400 font-bold">+</button>
+                              </div>
+                              <button onClick={() => removeFromCart(item.id)} className="text-slate-500 hover:text-rose-400 p-1">✕</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {cart.length > 0 && (
+                      <div className="border-t border-slate-800 pt-4 space-y-3">
+                        <div className="flex justify-between items-center text-sm font-black">
+                          <span className="text-slate-400">{t("totalSum")}:</span>
+                          <span className="text-amber-400 text-base">
+                            {cart.reduce((a, c) => a + (c.price * c.qty), 0).toLocaleString()} {t("currency")}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setIsCheckoutModalOpen(true)}
+                          className="w-full py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-slate-950 font-black text-xs rounded-xl shadow-lg"
+                        >
+                          {t("checkoutBtn")} 💳
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* CHECKOUT MODAL */}
+              {isCheckoutModalOpen && (
+                <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+                  <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 relative shadow-2xl">
+                    <button onClick={() => setIsCheckoutModalOpen(false)} className="absolute top-4 right-4 text-slate-400">✕</button>
+                    
+                    <h3 className="text-base font-black text-slate-100 mb-4 flex items-center gap-2">
+                      <i data-lucide="check-circle" className="w-5 h-5 text-emerald-400"></i>
+                      <span>Buyurtmani Tasdiqlash</span>
+                    </h3>
+
+                    <form onSubmit={handleCompleteOrderSubmit} className="space-y-4">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">Yetkazib berish manzili</label>
+                        <input
+                          type="text"
+                          value={checkoutAddress}
+                          onChange={(e) => setCheckoutAddress(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white outline-none focus:border-amber-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-400 block mb-1">To'lov Usuli</label>
+                        <select
+                          value={checkoutPaymentMethod}
+                          onChange={(e) => setCheckoutPaymentMethod(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white outline-none"
+                        >
+                          <option value="click">Click / Payme (Online)</option>
+                          <option value="nasiya">0% Nasiya (3 oyga bo'lib to'lash)</option>
+                          <option value="cash">Kuryerga Naqd yoki Karta orqali</option>
+                        </select>
+                      </div>
+
+                      <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-xs space-y-1">
+                        <div className="flex justify-between text-slate-400">
+                          <span>Mahsulotlar soni:</span>
+                          <span className="font-bold text-slate-200">{cart.reduce((a, c) => a + c.qty, 0)} dona</span>
+                        </div>
+                        <div className="flex justify-between text-slate-400">
+                          <span>Yetkazib berish (Express):</span>
+                          <span className="font-bold text-emerald-400">BEPUL 🚚</span>
+                        </div>
+                        <div className="flex justify-between text-amber-400 font-black pt-1 border-t border-slate-800 text-sm">
+                          <span>Jami Summa:</span>
+                          <span>{cart.reduce((a, c) => a + (c.price * c.qty), 0).toLocaleString()} so'm</span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-3 bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500 text-slate-950 font-black text-xs rounded-xl shadow-lg"
+                      >
+                        Tasdiqlash va Trek-Kod Olish 📦
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
               <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 md:hidden flex justify-around items-center py-2 px-1 shadow-2xl">
                 <button onClick={() => setActiveTab("shop")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'shop' ? 'text-amber-400' : 'text-slate-400'}`}>
                   <i data-lucide="shopping-bag" className="w-5 h-5"></i>
@@ -1437,6 +1680,11 @@
                 <button onClick={() => setActiveTab("wishlist")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold relative ${activeTab === 'wishlist' ? 'text-amber-400' : 'text-slate-400'}`}>
                   <i data-lucide="heart" className="w-5 h-5"></i>
                   <span>{t("favorites")}</span>
+                  {wishlist.length > 0 && (
+                    <span className="absolute -top-1 right-2 bg-rose-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">
+                      {wishlist.length}
+                    </span>
+                  )}
                 </button>
                 <button onClick={() => setActiveTab("stats")} className={`flex flex-col items-center gap-0.5 text-[10px] font-bold ${activeTab === 'stats' ? 'text-amber-400' : 'text-slate-400'}`}>
                   <i data-lucide="bar-chart-3" className="w-5 h-5"></i>
