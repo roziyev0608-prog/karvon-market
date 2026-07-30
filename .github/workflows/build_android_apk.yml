@@ -22,11 +22,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: 3. Java JDK 17 O'rnatish
+      - name: 3. Java JDK 21 O'rnatish
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '21'
 
       - name: 4. Capacitor va Android Muhitini Yig'ish
         run: |
