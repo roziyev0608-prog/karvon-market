@@ -17,7 +17,7 @@ jobs:
       - name: 2. Node.js Muhitini Sozlash
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: 3. Java JDK 17 O'rnatish
         uses: actions/setup-java@v4
