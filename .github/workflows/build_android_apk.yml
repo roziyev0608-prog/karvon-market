@@ -1,0 +1,49 @@
+name: Build Karvon Market Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    name: Generate Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Repository Kodini Yuklash
+        uses: actions/checkout@v3
+
+      - name: 2. Node.js Muhitini Sozlash
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 3. Java JDK 17 O'rnatish
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 4. Capacitor va Android Muhitini Yig'ish
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "Karvon Market" "com.karvonmarket.app" --web-dir www
+          npx cap add android
+          npx cap copy android
+          npx cap sync android
+
+      - name: 5. Android APK Faylini Yaratish (Gradle Build)
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: 6. Tayyor APK Faylini Yuklab Olish Uchun Saqlash
+        uses: actions/upload-artifact@v3
+        with:
+          name: KarvonMarket-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
